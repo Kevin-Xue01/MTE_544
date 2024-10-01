@@ -1,3 +1,4 @@
+import os
 from math import atan2, asin, sqrt
 from scipy.spatial.transform import Rotation as R
 from geometry_msgs.msg._quaternion import Quaternion
@@ -6,7 +7,7 @@ M_PI=3.1415926535
 class Logger:
     def __init__(self, filename, headers=["e", "e_dot", "e_int", "stamp"]):
         self.filename = filename
-
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
         with open(self.filename, 'w') as file:
             header_str=""
 

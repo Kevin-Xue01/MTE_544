@@ -34,9 +34,9 @@ class motion_executioner(Node):
         self.vel_publisher=self.create_publisher(Twist, "/cmd_vel", 10)                
         
         # loggers
-        self.imu_logger=Logger('imu_content_'+str(motion_types[motion_type])+'.csv', headers=["acc_x", "acc_y", "angular_z", "stamp"])
-        self.odom_logger=Logger('odom_content_'+str(motion_types[motion_type])+'.csv', headers=["x","y","th", "stamp"])
-        self.laser_logger=Logger('laser_content_'+str(motion_types[motion_type])+'.csv', headers=["ranges", "angle_increment", "stamp"])
+        self.imu_logger=Logger('logs/imu_content_'+str(motion_types[motion_type])+'.csv', headers=["acc_x", "acc_y", "angular_z", "stamp"])
+        self.odom_logger=Logger('logs/odom_content_'+str(motion_types[motion_type])+'.csv', headers=["x","y","th", "stamp"])
+        self.laser_logger=Logger('logs/laser_content_'+str(motion_types[motion_type])+'.csv', headers=["ranges", "angle_increment", "stamp"])
         
         qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
 
