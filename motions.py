@@ -98,24 +98,24 @@ class motion_executioner(Node):
             raise SystemExit 
 
         self.vel_publisher.publish(cmd_vel_msg)
-        
-    
-    # TODO Part 4: Motion functions: complete the functions to generate the proper messages corresponding to the desired motions of the robot
-
+            
     def make_circular_twist(self):
-        
         msg=Twist()
-        ... # fill up the twist msg for circular motion
+        msg.linear.y = 0.1
+        msg.angular.z = 0.1
+
         return msg
 
     def make_spiral_twist(self):
         msg=Twist()
-        ... # fill up the twist msg for spiral motion
+        msg.linear.x = 0.05
+        msg.linear.y = 0.1
+        msg.angular.z = 0.1        
         return msg
     
     def make_acc_line_twist(self):
         msg=Twist()
-        ... # fill up the twist msg for line motion
+        msg.linear.y = 0.1
         return msg
 
 import argparse
@@ -144,7 +144,7 @@ if __name__=="__main__":
         ME=motion_executioner(motion_type=SPIRAL)
 
     else:
-        print(f"we don't have {arg.motion.lower()} motion type")
+        print(f"we don't have {args.motion.lower()} motion type")
 
 
     
