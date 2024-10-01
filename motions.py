@@ -13,10 +13,6 @@ from nav_msgs.msg import Odometry
 
 from rclpy.time import Time
 
-# You may add any other imports you may need/want to use below
-# import ...
-# justin zhu
-
 CIRCLE=0; SPIRAL=1; ACC_LINE=2
 motion_types=['circle', 'spiral', 'line']
 
@@ -35,19 +31,17 @@ class motion_executioner(Node):
         self.odom_initialized=False
         self.laser_initialized=False
         
-        # TODO Part 3: Create a publisher to send velocity commands by setting the proper parameters in (...)
         self.vel_publisher=self.create_publisher(Twist, "/cmd_vel", 10)                
+        
         # loggers
         self.imu_logger=Logger('imu_content_'+str(motion_types[motion_type])+'.csv', headers=["acc_x", "acc_y", "angular_z", "stamp"])
         self.odom_logger=Logger('odom_content_'+str(motion_types[motion_type])+'.csv', headers=["x","y","th", "stamp"])
         self.laser_logger=Logger('laser_content_'+str(motion_types[motion_type])+'.csv', headers=["ranges", "angle_increment", "stamp"])
         
-        # TODO Part 3: Create the QoS profile by setting the proper parameters in (...)
-        qos=QoSProfile(...)
+        qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
 
         # TODO Part 5: Create below the subscription to the topics corresponding to the respective sensors
         # IMU subscription
-        
         ...
         
         # ENCODER subscription
@@ -71,8 +65,10 @@ class motion_executioner(Node):
         ...    # log imu msgs
         
     def odom_callback(self, odom_msg: Odometry):
-        
-        ... # log odom msgs
+        timestamp = Time.from_msg(odom_msg.header.stamp).nanoseconds
+        odom_orientation = odom_msg.pose.pose.orientation
+        odom_x_pos = odom_msg.pose.pose.position.x
+        odom_y_pos = odom_msg.pose.pose.position.y
                 
     def laser_callback(self, laser_msg: LaserScan):
         
