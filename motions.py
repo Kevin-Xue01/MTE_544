@@ -45,8 +45,8 @@ class motion_executioner(Node):
         ...
         
         # ENCODER subscription
+        self.create_subscription(Odometry, "/odom", self.odom_callback, qos_profile=qos)
 
-        ...
         
         # LaserScan subscription 
         
@@ -69,6 +69,7 @@ class motion_executioner(Node):
         odom_orientation = odom_msg.pose.pose.orientation
         odom_x_pos = odom_msg.pose.pose.position.x
         odom_y_pos = odom_msg.pose.pose.position.y
+        self.odom_logger.log_values([timestamp, odom_orientation, odom_x_pos, odom_y_pos])
                 
     def laser_callback(self, laser_msg: LaserScan):
         
@@ -121,32 +122,22 @@ class motion_executioner(Node):
 import argparse
 
 if __name__=="__main__":
-    
-
     argParser=argparse.ArgumentParser(description="input the motion type")
 
-
     argParser.add_argument("--motion", type=str, default="circle")
-
-
 
     rclpy.init()
 
     args = argParser.parse_args()
 
     if args.motion.lower() == "circle":
-
         ME=motion_executioner(motion_type=CIRCLE)
     elif args.motion.lower() == "line":
         ME=motion_executioner(motion_type=ACC_LINE)
-
     elif args.motion.lower() =="spiral":
         ME=motion_executioner(motion_type=SPIRAL)
-
     else:
         print(f"we don't have {args.motion.lower()} motion type")
-
-
     
     try:
         rclpy.spin(ME)
