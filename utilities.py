@@ -1,6 +1,6 @@
 from math import atan2, asin, sqrt
 from scipy.spatial.transform import Rotation as R
-
+from geometry_msgs.msg._quaternion import Quaternion
 M_PI=3.1415926535
 
 class Logger:
@@ -77,12 +77,13 @@ class FileReader:
         return headers, table
 
 
-def euler_from_quaternion(quat):
+def euler_from_quaternion(quat: Quaternion):
     """
     Convert quaternion (w in last place) to euler roll, pitch, yaw.
     quat = [x, y, z, w]
     """
-    rotation = R.from_quat(quat)
+    
+    rotation = R.from_quat([quat.x, quat.y, quat.z, quat.w])
     euler_angles = rotation.as_euler('xyz', degrees=False)
     
     return euler_angles[2]

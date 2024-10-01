@@ -66,10 +66,10 @@ class motion_executioner(Node):
         
     def odom_callback(self, odom_msg: Odometry):
         timestamp = Time.from_msg(odom_msg.header.stamp).nanoseconds
-        odom_orientation = odom_msg.pose.pose.orientation
+        odom_yaw = euler_from_quaternion(odom_msg.pose.pose.orientation)
         odom_x_pos = odom_msg.pose.pose.position.x
         odom_y_pos = odom_msg.pose.pose.position.y
-        self.odom_logger.log_values([timestamp, odom_orientation, odom_x_pos, odom_y_pos])
+        self.odom_logger.log_values([odom_x_pos, odom_y_pos, odom_yaw, timestamp])
                 
     def laser_callback(self, laser_msg: LaserScan):
         
