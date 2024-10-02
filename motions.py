@@ -49,8 +49,7 @@ class motion_executioner(Node):
 
         
         # LaserScan subscription 
-        
-        ...
+        self.create_subscription(LaserScan, "/scan",self.laser_callback, qos_profile = qos)
         
         self.create_timer(0.1, self.timer_callback)
 
@@ -76,8 +75,10 @@ class motion_executioner(Node):
         self.odom_logger.log_values([odom_x_pos, odom_y_pos, odom_yaw, timestamp])
                 
     def laser_callback(self, laser_msg: LaserScan):
-        
-        ... # log laser msgs with position msg at that time
+        timestamp = Time.from_msg(laser_msg.header.stamp).nanoseconds
+        ranges = laser_msg.ranges
+        angle_increment = laser_msg.angle_increment
+        self.laser_logger.log_values([laser_msg,angle_increment])
                 
     def timer_callback(self):
         
