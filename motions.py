@@ -49,7 +49,7 @@ class motion_executioner(Node):
 
         
         # LaserScan subscription 
-        self.create_subscription(LaserScan, "/scan",self.laser_callback, qos_profile = qos)
+        self.create_subscription(LaserScan, "/scan",self.laser_callback, qos_profile=qos)
         
         self.create_timer(0.1, self.timer_callback)
 
@@ -65,7 +65,7 @@ class motion_executioner(Node):
         accel_x = imu_msg.linear_acceleration.x
         accel_y = imu_msg.linear_acceleration.y
         angular_z = imu_msg.angular_velocity.z
-        self.imu_logger.log_values([accel_x,accel_y,angular_z,timestamp])
+        self.imu_logger.log_values([accel_x, accel_y, angular_z, timestamp])
         
     def odom_callback(self, odom_msg: Odometry):
         timestamp = Time.from_msg(odom_msg.header.stamp).nanoseconds
@@ -78,10 +78,9 @@ class motion_executioner(Node):
         timestamp = Time.from_msg(laser_msg.header.stamp).nanoseconds
         ranges = laser_msg.ranges
         angle_increment = laser_msg.angle_increment
-        self.laser_logger.log_values([laser_msg,angle_increment])
+        self.laser_logger.log_values([ranges, angle_increment, timestamp])
                 
     def timer_callback(self):
-        
         if self.odom_initialized and self.laser_initialized and self.imu_initialized:
             self.successful_init=True
             
