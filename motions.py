@@ -42,7 +42,7 @@ class motion_executioner(Node):
 
         # TODO Part 5: Create below the subscription to the topics corresponding to the respective sensors
         # IMU subscription
-        ...
+        self.create_subscription(Imu, "/imu", self.imu_callback, qos_profile=qos)
         
         # ENCODER subscription
         self.create_subscription(Odometry, "/odom", self.odom_callback, qos_profile=qos)
