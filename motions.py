@@ -61,24 +61,25 @@ class motion_executioner(Node):
     # You can save the needed fields into a list, and pass the list to the log_values function in utilities.py
 
     def imu_callback(self, imu_msg: Imu):
-        timestamp = Time.from_msg(imu_msg.header.stamp).nanoseconds
-        accel_x = imu_msg.linear_acceleration.x
-        accel_y = imu_msg.linear_acceleration.y
-        angular_z = imu_msg.angular_velocity.z
+        timestamp = str(Time.from_msg(imu_msg.header.stamp).nanoseconds)
+        accel_x = str(imu_msg.linear_acceleration.x)
+        accel_y = str(imu_msg.linear_acceleration.y)
+        angular_z = str(imu_msg.angular_velocity.z)
         self.imu_logger.log_values([accel_x, accel_y, angular_z, timestamp])
         
     def odom_callback(self, odom_msg: Odometry):
-        timestamp = Time.from_msg(odom_msg.header.stamp).nanoseconds
-        odom_yaw = euler_from_quaternion(odom_msg.pose.pose.orientation)
-        odom_x_pos = odom_msg.pose.pose.position.x
-        odom_y_pos = odom_msg.pose.pose.position.y
+        timestamp = str(Time.from_msg(odom_msg.header.stamp).nanoseconds)
+        odom_yaw = str(euler_from_quaternion(odom_msg.pose.pose.orientation))
+        odom_x_pos = str(odom_msg.pose.pose.position.x)
+        odom_y_pos = str(odom_msg.pose.pose.position.y)
+
         self.odom_logger.log_values([odom_x_pos, odom_y_pos, odom_yaw, timestamp])
                 
     def laser_callback(self, laser_msg: LaserScan):
         timestamp = Time.from_msg(laser_msg.header.stamp).nanoseconds
         ranges = laser_msg.ranges
         angle_increment = laser_msg.angle_increment
-        self.laser_logger.log_values([ranges, angle_increment, timestamp])
+        self.laser_logger.log_values(["|".join([str(i) for i in ranges]), str(angle_increment), str(timestamp)])
                 
     def timer_callback(self):
         if self.odom_initialized and self.laser_initialized and self.imu_initialized:
