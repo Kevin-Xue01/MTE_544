@@ -62,7 +62,11 @@ class motion_executioner(Node):
     # You can save the needed fields into a list, and pass the list to the log_values function in utilities.py
 
     def imu_callback(self, imu_msg: Imu):
-        ...    # log imu msgs
+        timestamp = Time.from_msg(imu_msg.header.stamp).nanoseconds
+        accel_x = imu_msg.linear_acceleration.x
+        accel_y = imu_msg.linear_acceleration.y
+        angular_z = imu_msg.angular_velocity.z
+        self.imu_logger.log_values([accel_x,accel_y,angular_z,timestamp])
         
     def odom_callback(self, odom_msg: Odometry):
         timestamp = Time.from_msg(odom_msg.header.stamp).nanoseconds
