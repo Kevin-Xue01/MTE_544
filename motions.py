@@ -25,7 +25,7 @@ class motion_executioner(Node):
         self.type=motion_type
         
         self.radius_=0.0
-        
+        self.counter = 0.0
         self.successful_init=False
         self.imu_initialized=False
         self.odom_initialized=False
@@ -82,12 +82,11 @@ class motion_executioner(Node):
         self.laser_logger.log_values(["|".join([str(i) for i in ranges]), str(angle_increment), str(timestamp)])
                 
     def timer_callback(self):
-        if self.odom_initialized and self.laser_initialized and self.imu_initialized:
-            self.successful_init=True
+        # if self.odom_initialized and self.laser_initialized and self.imu_initialized:
+        #    self.successful_init=True
             
-        if not self.successful_init:
-            return
-        
+        # if not self.successful_init:
+        #    return
         cmd_vel_msg=Twist()
         
         if self.type==CIRCLE:
@@ -107,21 +106,22 @@ class motion_executioner(Node):
             
     def make_circular_twist(self):
         msg=Twist()
-        msg.linear.y = 0.1
-        msg.angular.z = 0.1
+        msg.linear.x = 0.5
+        msg.angular.z = 1.0
 
         return msg
 
     def make_spiral_twist(self):
         msg=Twist()
-        msg.linear.x = 0.05
-        msg.linear.y = 0.1
-        msg.angular.z = 0.1        
+        msg.linear.x = self.counter
+        self.counter += 0.01
+        msg.angular.z = 1.0        
         return msg
     
     def make_acc_line_twist(self):
         msg=Twist()
-        msg.linear.y = 0.1
+        msg.linear.x = self.counter
+        self.counter += 0.01
         return msg
 
 import argparse
