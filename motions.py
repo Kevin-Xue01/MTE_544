@@ -79,7 +79,7 @@ class motion_executioner(Node):
         timestamp = Time.from_msg(laser_msg.header.stamp).nanoseconds
         ranges = laser_msg.ranges
         angle_increment = laser_msg.angle_increment
-        self.laser_logger.log_values([str(ranges), str(angle_increment), str(timestamp)])
+        self.laser_logger.log_values(["|".join([str(i) for i in ranges]), str(angle_increment), str(timestamp)])
                 
     def timer_callback(self):
         if self.odom_initialized and self.laser_initialized and self.imu_initialized:
