@@ -2,12 +2,13 @@ import os
 from math import atan2, asin, sqrt
 from scipy.spatial.transform import Rotation as R
 from geometry_msgs.msg._quaternion import Quaternion
+
 M_PI=3.1415926535
 
 class Logger:
     def __init__(self, filename, headers=["e", "e_dot", "e_int", "stamp"]):
         self.filename = filename
-        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        os.makedirs(os.path.dirname(filename), exist_ok=True) # make directory if directory does not exist
         with open(self.filename, 'w') as file:
             header_str=""
 
@@ -21,26 +22,16 @@ class Logger:
 
 
     def log_values(self, values_list):
-
         with open(self.filename, 'a') as file:
             vals_str = ', '.join(values_list)
-            
             vals_str+="\n"
-            
             file.write(vals_str)
-            
-
-    def save_log(self):
-        pass
 
 class FileReader:
     def __init__(self, filename):
-        
         self.filename = filename
         
-        
     def read_file(self):
-        
         read_headers=False
 
         table=[]

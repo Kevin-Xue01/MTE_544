@@ -19,74 +19,57 @@ motion_types=['circle', 'spiral', 'line']
 class motion_executioner(Node):
     
     def __init__(self, motion_type=0):
-        
         super().__init__("motion_types")
         
         self.type=motion_type
+        self.linear_x = 0.0
         
-        self.radius_=0.0
-        self.counter = 0.0
-        self.successful_init=False
-        self.imu_initialized=False
-        self.odom_initialized=False
-        self.laser_initialized=False
+        self.vel_publisher=self.create_publisher(Twist, "/cmd_vel", 10) # initialize velocity publisher     
         
-        self.vel_publisher=self.create_publisher(Twist, "/cmd_vel", 10)                
-        
-        # loggers
+        # initalize loggers
         self.imu_logger=Logger('logs/imu_content_'+str(motion_types[motion_type])+'.csv', headers=["acc_x", "acc_y", "angular_z", "stamp"])
         self.odom_logger=Logger('logs/odom_content_'+str(motion_types[motion_type])+'.csv', headers=["x","y","th", "stamp"])
         self.laser_logger=Logger('logs/laser_content_'+str(motion_types[motion_type])+'.csv', headers=["ranges", "angle_increment", "stamp"])
         
-        qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
+        qos=QoSProfile(reliability=2, durability=2, history=1, depth=10) # create QoS profile based on tutorial
 
-        # TODO Part 5: Create below the subscription to the topics corresponding to the respective sensors
-        # IMU subscription
+        # imu subscription
         self.create_subscription(Imu, "/imu", self.imu_callback, qos_profile=qos)
         
-        # ENCODER subscription
+        # encoder/odometry subscription
         self.create_subscription(Odometry, "/odom", self.odom_callback, qos_profile=qos)
 
         
-        # LaserScan subscription 
+        # laser scan subscription 
         self.create_subscription(LaserScan, "/scan",self.laser_callback, qos_profile=qos)
         
+        # Initialize timer with interval of 0.1 seconds to publish Twist msgs based on path type
         self.create_timer(0.1, self.timer_callback)
 
-
-    # TODO Part 5: Callback functions: complete the callback functions of the three sensors to log the proper data.
-    # To also log the time you need to use the rclpy Time class, each ros msg will come with a header, and then
-    # inside the header you have a stamp that has the time in seconds and nanoseconds, you should log it in nanoseconds as 
-    # such: Time.from_msg(imu_msg.header.stamp).nanoseconds
-    # You can save the needed fields into a list, and pass the list to the log_values function in utilities.py
-
     def imu_callback(self, imu_msg: Imu):
-        timestamp = str(Time.from_msg(imu_msg.header.stamp).nanoseconds)
-        accel_x = str(imu_msg.linear_acceleration.x)
-        accel_y = str(imu_msg.linear_acceleration.y)
-        angular_z = str(imu_msg.angular_velocity.z)
-        self.imu_logger.log_values([accel_x, accel_y, angular_z, timestamp])
+        timestamp = str(Time.from_msg(imu_msg.header.stamp).nanoseconds) # extract timestamp in nanoseconds from the imu_msg object
+        accel_x = str(imu_msg.linear_acceleration.x) # extract x acceleration from the imu_msg object
+        accel_y = str(imu_msg.linear_acceleration.y) # extract y acceleration from the imu_msg object
+        angular_z = str(imu_msg.angular_velocity.z) # extract angular veloctiy from the imu_msg object
+        self.imu_logger.log_values([accel_x, accel_y, angular_z, timestamp]) # log the imu_msg data to csv
         
     def odom_callback(self, odom_msg: Odometry):
-        timestamp = str(Time.from_msg(odom_msg.header.stamp).nanoseconds)
-        odom_yaw = str(euler_from_quaternion(odom_msg.pose.pose.orientation))
-        odom_x_pos = str(odom_msg.pose.pose.position.x)
-        odom_y_pos = str(odom_msg.pose.pose.position.y)
-
-        self.odom_logger.log_values([odom_x_pos, odom_y_pos, odom_yaw, timestamp])
+        timestamp = str(Time.from_msg(odom_msg.header.stamp).nanoseconds) # extract timestamp in nanoseconds from the odom_msg
+        odom_yaw = str(euler_from_quaternion(odom_msg.pose.pose.orientation)) # extract orientation as a quaternion from the odom_msg object and convert to a yaw angle
+        odom_x_pos = str(odom_msg.pose.pose.position.x) # extract x position from the odom_msg object
+        odom_y_pos = str(odom_msg.pose.pose.position.y) # extract y position from the odom_msg object
+        self.odom_logger.log_values([odom_x_pos, odom_y_pos, odom_yaw, timestamp]) # log the odom_msg data to csv
+        
                 
     def laser_callback(self, laser_msg: LaserScan):
-        timestamp = Time.from_msg(laser_msg.header.stamp).nanoseconds
-        ranges = laser_msg.ranges
-        angle_increment = laser_msg.angle_increment
-        self.laser_logger.log_values(["|".join([str(i) for i in ranges]), str(angle_increment), str(timestamp)])
-                
+        timestamp = Time.from_msg(laser_msg.header.stamp).nanoseconds # extract timestamp in nanoseconds from the laser_msg
+        ranges = laser_msg.ranges # extract range data from the laser_msg object
+        angle_increment = laser_msg.angle_increment # extract angle increment from the laser_msg object
+        self.laser_logger.log_values(["|".join([str(i) for i in ranges]), str(angle_increment), str(timestamp)]) # log the laser_msg data to csv, convert range data of type=list to a string separated by '|'
+
+
+    # publish Twist msg based on motion type   
     def timer_callback(self):
-        # if self.odom_initialized and self.laser_initialized and self.imu_initialized:
-        #    self.successful_init=True
-            
-        # if not self.successful_init:
-        #    return
         cmd_vel_msg=Twist()
         
         if self.type==CIRCLE:
@@ -106,22 +89,31 @@ class motion_executioner(Node):
             
     def make_circular_twist(self):
         msg=Twist()
-        msg.linear.x = 0.5
+
+        # set a constant linear and angular velocity to achieve circular path
         msg.angular.z = 1.0
+        msg.linear.x = 0.5
 
         return msg
 
     def make_spiral_twist(self):
         msg=Twist()
-        msg.linear.x = self.counter
-        self.counter += 0.01
         msg.angular.z = 1.0        
+
+        # increase velocity over time to achieve linear acceleration,
+        # combined with non-zero angular velocity to achieve a spiral path
+        msg.linear.x = self.linear_x
+        self.linear_x += 0.01 
+
         return msg
     
     def make_acc_line_twist(self):
         msg=Twist()
-        msg.linear.x = self.counter
-        self.counter += 0.01
+
+        # increase velocity over time to achieve linear acceleration
+        msg.linear.x = self.linear_x
+        self.linear_x += 0.01 
+
         return msg
 
 import argparse
