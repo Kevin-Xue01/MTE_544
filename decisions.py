@@ -1,4 +1,3 @@
-# Imports
 import argparse
 import sys
 from rclpy import init, spin, spin_once
@@ -74,25 +73,20 @@ class decision_maker(Node):
 
 
 def main(args=None):
-    
     init()
 
     # TODO Part 3: You migh need to change the QoS profile based on whether you're using the real robot or in simulation.
     # Remember to define your QoS profile based on the information available in "ros2 topic info /odom --verbose" as explained in Tutorial 3
     
     odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
-    
 
-    # TODO Part 4: instantiate the decision_maker with the proper parameters for moving the robot
     if args.motion.lower() == "point":
         DM=decision_maker(PlannerType.POINT)
     elif args.motion.lower() == "trajectory":
         DM=decision_maker(PlannerType.TRAJECTORY)
     else:
         print("invalid motion type", file=sys.stderr)        
-    
-    
-    
+
     try:
         spin(DM)
     except SystemExit:
