@@ -1,11 +1,6 @@
 # Imports
-
-
+import argparse
 import sys
-
-from utilities import euler_from_quaternion, calculate_angular_error, calculate_linear_error
-from pid import PID_ctrl
-
 from rclpy import init, spin, spin_once
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
@@ -13,42 +8,26 @@ from geometry_msgs.msg import Twist
 from rclpy.qos import QoSProfile
 from nav_msgs.msg import Odometry as odom
 
+from utilities import PlannerType, euler_from_quaternion, calculate_angular_error, calculate_linear_error
+from pid import PID_ctrl
 from localization import localization, rawSensor
-
-from planner import TRAJECTORY_PLANNER, POINT_PLANNER, planner
+from planner import planner
 from controller import controller, trajectoryController
-
-# You may add any other imports you may need/want to use below
-# import ...
-
 
 class decision_maker(Node):
     
-    def __init__(self, publisher_msg, publishing_topic, qos_publisher, goalPoint, rate=10, motion_type=POINT_PLANNER):
+    def __init__(self, publisher_msg, publishing_topic, qos_publisher, goalPoint, motion_type: PlannerType, rate=10):
 
         super().__init__("decision_maker")
 
         #TODO Part 4: Create a publisher for the topic responsible for robot's motion
         self.publisher=self.create_publisher(Twist, "/cmd_vel", 10) # initialize velocity publisher
 
-        publishing_period=1/rate
+        publishing_period = 1 / rate
         
-        # Instantiate the controller
-        # TODO Part 5: Tune your parameters here
+        self.controller=controller()
+        self.planner=planner(motion_type)    
     
-        if motion_type == POINT_PLANNER:
-            self.controller=controller(klp=0.2, klv=0.5, kap=0.8, kav=0.6)
-            self.planner=planner(POINT_PLANNER)    
-    
-    
-        elif motion_type==TRAJECTORY_PLANNER:
-            self.controller=trajectoryController(klp=0.2, klv=0.5, kap=0.8, kav=0.6)
-            self.planner=planner(TRAJECTORY_PLANNER)
-
-        else:
-            print("Error! you don't have this planner", file=sys.stderr)
-
-
         # Instantiate the localization, use rawSensor for now  
         self.localizer=localization(rawSensor)
 
@@ -92,7 +71,6 @@ class decision_maker(Node):
         #TODO Part 4: Publish the velocity to move the robot
         ... 
 
-import argparse
 
 
 def main(args=None):
@@ -107,9 +85,9 @@ def main(args=None):
 
     # TODO Part 4: instantiate the decision_maker with the proper parameters for moving the robot
     if args.motion.lower() == "point":
-        DM=decision_maker(...)
+        DM=decision_maker(PlannerType.POINT)
     elif args.motion.lower() == "trajectory":
-        DM=decision_maker(...)
+        DM=decision_maker(PlannerType.TRAJECTORY)
     else:
         print("invalid motion type", file=sys.stderr)        
     

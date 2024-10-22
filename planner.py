@@ -1,4 +1,5 @@
 import math
+from utilities import PlannerType
 # Type of planner
 POINT_PLANNER=0; TRAJECTORY_PLANNER=1
 
@@ -8,17 +9,17 @@ selected_trajectory = PARABOLA
 trajectory_resolution = 100
 
 class planner:
-    def __init__(self, type_):
+    def __init__(self, type_: PlannerType):
 
         self.type=type_
 
     
     def plan(self, goalPoint=[-1.0, -1.0]):
         
-        if self.type==POINT_PLANNER:
+        if self.type==PlannerType.POINT:
             return self.point_planner(goalPoint)
         
-        elif self.type==TRAJECTORY_PLANNER:
+        elif self.type==PlannerType.TRAJECTORY:
             return self.trajectory_planner()
 
 

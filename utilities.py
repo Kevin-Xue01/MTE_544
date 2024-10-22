@@ -2,11 +2,40 @@ import os
 from math import atan2, asin, sqrt
 from scipy.spatial.transform import Rotation as R
 from geometry_msgs.msg._quaternion import Quaternion
+from enum import Enum
 
-M_PI=3.1415926535
+class ControllerType(Enum):
+    P = 'P'
+    PD = 'PD'
+    PI = 'PI'
+    PID = 'PID'
+    CURRENT = P
+
+class PlannerType(Enum):
+    POINT = 'POINT'
+    TRAJECTORY = 'TRAJECTORY'
+
+class ControllerGains(Enum):
+    KP = 'KP'
+    KI = 'KI'
+    KD = 'KD'
+
+class Config:
+    LINEAR_VELOCITY_LIMIT = 1.0
+    ANGULAR_VELOCITY_LIMIT = 1.0
+    LINEAR_CONTROLLER_GAIN = {
+        ControllerGains.KP: 1.2,
+        ControllerGains.KI: 0.2,
+        ControllerGains.KD: 0.8
+    }
+    ANGULAR_CONTROLLER_GAIN = {
+        ControllerGains.KP: 1.2,
+        ControllerGains.KI: 0.2,
+        ControllerGains.KD: 0.8
+    }
+
 
 class Logger:
-    
     def __init__(self, filename, headers=["e", "e_dot", "e_int", "stamp"]):
         
         self.filename = filename

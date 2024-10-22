@@ -1,33 +1,26 @@
 from rclpy.time import Time
-from utilities import Logger
-
-# Controller type
-P=0 # poportional
-PD=1 # proportional and derivative
-PI=2 # proportional and integral
-PID=3 # proportional, integral, derivative
+from utilities import ControllerGains, Config, ControllerType, Logger
 
 class PID_ctrl:
     
-    def __init__(self, type_, kp=1.2,kv=0.8,ki=0.2, history_length=3, filename_="errors.csv"):
+    def __init__(self, config: dict[ControllerGains, float], filename, history_length=3):
         
         # Data for the controller
         self.history_length=history_length
         self.history=[]
-        self.type=type_
+        self.type = ControllerType.CURRENT
 
         # Controller gains
-        self.kp=kp    # proportional gain
-        self.kv=kv    # derivative gain
-        self.ki=ki    # integral gain
+        self.kp=config[ControllerGains.KP]    # proportional gain
+        self.kv=config[ControllerGains.KD]   # derivative gain
+        self.ki=config[ControllerGains.KI]    # integral gain
         
-        self.logger=Logger(filename_)
+        self.logger=Logger(filename + "_errors.csv")
         # Remeber that you are writing to the file named filename_ or errors.csv the following:
             # error, error_dot, error_int and time stamp
 
     
     def update(self, stamped_error, status):
-        
         if status == False:
             self.__update(stamped_error)
             return 0.0
@@ -84,18 +77,18 @@ class PID_ctrl:
         self.logger.log_values( ... )
         
         # TODO Part 4: Implement the control law of P-controller
-        if self.type == P:
+        if self.type == ControllerType.P:
             return ... # complete
         
         # TODO Part 5: Implement the control law corresponding to each type of controller
-        elif self.type == PD:
+        elif self.type == ControllerType.PD:
             pass
             # return ... # complete
         
-        elif self.type == PI:
+        elif self.type == ControllerType.PI:
             pass
             # return ... # complete
         
-        elif self.type == PID:
+        elif self.type == ControllerType.PID:
             pass
             # return ... # complete
