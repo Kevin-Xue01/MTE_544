@@ -39,15 +39,10 @@ class localization(Node):
         
         self.pose=[odom_x_pos, odom_y_pos, odom_yaw, timestamp]
         
-        # Log the data
         self.loc_logger.log_values([self.pose[0], self.pose[1], self.pose[2], Time.from_msg(self.pose[3]).nanoseconds])
 
     def getPose(self):
         return self.pose
-
-# TODO Part 3
-# Here put a guard that makes the node run, ONLY when run as a main thread!
-# This is to make sure this node functions right before using it in decision.py
 
 def main(args = None):
     rclpy.init()

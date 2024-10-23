@@ -19,7 +19,6 @@ class decision_maker(Node):
 
         super().__init__("decision_maker")
 
-        #TODO Part 4: Create a publisher for the topic responsible for robot's motion
         self.publisher=self.create_publisher(Twist, "/cmd_vel", 10) # initialize velocity publisher
 
         publishing_period = 1 / rate

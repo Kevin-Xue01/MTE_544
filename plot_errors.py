@@ -1,9 +1,6 @@
 import matplotlib.pyplot as plt
 from utilities import FileReader
 
-
-
-
 def plot_errors(filename):
     
     headers, values=FileReader(filename).read_file()
@@ -33,11 +30,6 @@ def plot_errors(filename):
     axes[1].grid()
 
     plt.show()
-    
-    
-
-
-
 
 
 import argparse
@@ -54,6 +46,3 @@ if __name__=="__main__":
     filenames=args.files
     for filename in filenames:
         plot_errors(filename)
-
-
-
