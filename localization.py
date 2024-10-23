@@ -35,7 +35,7 @@ class localization(Node):
         
         self.pose=[odom_x_pos, odom_y_pos, odom_yaw, timestamp]
         
-        self.loc_logger.log_values([self.pose[0], self.pose[1], self.pose[2], Time.from_msg(self.pose[3]).nanoseconds])
+        self.loc_logger.log_values([self.pose[0], self.pose[1], self.pose[2], self.pose[3]])
 
     def getPose(self):
         return self.pose
