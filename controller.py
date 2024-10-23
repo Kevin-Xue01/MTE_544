@@ -8,13 +8,13 @@ class controller:
         self.PID_linear=PID_ctrl(Config.LINEAR_CONTROLLER_GAIN, filename_="linear.csv")
         self.PID_angular=PID_ctrl(Config.ANGULAR_CONTROLLER_GAIN, filename_="angular.csv")
     
-    def vel_request(self, pose, goal, status):
+    def vel_request(self, pose, goal, status) -> tuple[float, float]:
         
         e_lin=calculate_linear_error(pose, goal)
         e_ang=calculate_angular_error(pose, goal)
 
-        linear_vel=self.PID_linear.update([e_lin, pose[3]], status)
-        angular_vel=self.PID_angular.update([e_ang, pose[3]], status)
+        linear_vel=self.PID_linear.update((e_lin, pose[3]), status)
+        angular_vel=self.PID_angular.update((e_ang, pose[3]), status)
         
         if(abs(linear_vel) > Config.LINEAR_VELOCITY_LIMIT):
             if(linear_vel>0):
@@ -43,8 +43,8 @@ class trajectoryController(controller):
         e_lin=calculate_linear_error(pose, finalGoal)
         e_ang=calculate_angular_error(pose, goal)
         
-        linear_vel=self.PID_linear.update([e_lin, pose[3]], status)
-        angular_vel=self.PID_angular.update([e_ang, pose[3]], status) 
+        linear_vel=self.PID_linear.update((e_lin, pose[3]), status)
+        angular_vel=self.PID_angular.update((e_ang, pose[3]), status) 
 
         if(abs(linear_vel) > Config.LINEAR_VELOCITY_LIMIT):
             linear_vel = Config.LINEAR_VELOCITY_LIMIT if linear_vel > 0 else (-Config.LINEAR_VELOCITY_LIMIT)

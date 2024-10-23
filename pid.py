@@ -7,13 +7,13 @@ class PID_ctrl:
         self.type = Config.CONTROLLER_TYPE
 
         # Controller gains
-        self.kp=config[ControllerGains.KP] # proportional gain
-        self.kv=config[ControllerGains.KD] # derivative gain
-        self.ki=config[ControllerGains.KI] # integral gain
+        self.kp = config[ControllerGains.KP] # proportional gain
+        self.kv = config[ControllerGains.KD] # derivative gain
+        self.ki = config[ControllerGains.KI] # integral gain
         
         self.logger=Logger(filename + "_errors.csv")
     
-    def update(self, stamped_error, status):
+    def update(self, stamped_error: tuple[float, str], status) -> float:
         if status == False:
             self.__update(stamped_error)
             return 0.0
@@ -21,7 +21,7 @@ class PID_ctrl:
             return self.__update(stamped_error)
 
         
-    def __update(self, stamped_error):
+    def __update(self, stamped_error: tuple[float, str]): #
         latest_error = stamped_error[0]
         latest_error_timestamp = stamped_error[1]
         
@@ -34,8 +34,8 @@ class PID_ctrl:
         if (len(self.history) != self.history_length):
             return self.kp * latest_error
         
-        dt_avg = 0
-        error_dot = 0
+        dt_avg = 0.0
+        error_dot = 0.0
         
         for i in range(1, len(self.history)):
             
@@ -53,7 +53,7 @@ class PID_ctrl:
         sum_ = sum([val[0] for val in self.history])
         error_int = sum_ * dt_avg
         
-        self.logger.log_values([latest_error, error_dot, error_int, latest_error_timestamp])
+        self.logger.log_values([str(latest_error), str(error_dot), str(error_int), latest_error_timestamp])
         
         if self.type == ControllerType.P:
             return self.kp * latest_error

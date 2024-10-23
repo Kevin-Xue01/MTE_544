@@ -3,9 +3,9 @@ from utilities import Config, PlannerType
 
 class planner:
     def __init__(self, type_: PlannerType):
-        self.type=type_
+        self.type = type_
     
-    def plan(self, goalPoint=[-1.0, -1.0]):
+    def plan(self, goalPoint=[2.0, 2.0]):
         if self.type==PlannerType.POINT:
             return self.point_planner(goalPoint)
         else:
