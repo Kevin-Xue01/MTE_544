@@ -1,6 +1,6 @@
 import argparse
 import sys
-from rclpy import init, spin, spin_once
+from rclpy import init, spin, spin_once, shutdown
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 
@@ -89,7 +89,7 @@ def main(args=None):
         spin(DM)
     except SystemExit:
         print(f"reached there successfully {DM.localizer.pose}")
-
+        shutdown()
 
 if __name__=="__main__":
 
