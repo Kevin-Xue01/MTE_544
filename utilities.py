@@ -42,6 +42,9 @@ class Config:
     }
 
     PLANNER_PATH = PlannerType.PATH_PARABOLA
+    PLANNER_TRAJECTORY_RESOLUTION = 100
+    PLANNER_TRAJECTORY_GAIN = 1.0
+    PLANNER_TRAJECTORY_XMAX = 2.0
 
 
 class Logger:
@@ -135,14 +138,9 @@ def euler_from_quaternion(quat):
 
 
 def calculate_linear_error(current_pose, goal_pose):
-        
-    # Compute the linear error in x and y
-    # Remember that current_pose = [x,y, theta, time stamp] and goal_pose = [x,y]
-    # Remember to use the Euclidean distance to calculate the error.
-    
-    #From Control Lecture
     x_diff = goal_pose[0] - current_pose[0]
     y_diff = goal_pose[1] - current_pose[1]
+    
     error_linear= sqrt((x_diff*x_diff)+(y_diff*y_diff))
 
     return error_linear

@@ -1,8 +1,5 @@
 import math
-from utilities import PlannerType
-
-selected_trajectory = PARABOLA
-trajectory_resolution = 100
+from utilities import Config, PlannerType
 
 class planner:
     def __init__(self, type_: PlannerType):
@@ -19,21 +16,24 @@ class planner:
         y = goalPoint[1]
         return x, y
 
-    # TODO Part 6: Implement the trajectories here
-    def trajectory_planner(self, steepness = 2):
+    def trajectory_planner(self, trajectory_resolution, gain, x_maximum, selected_trajectory, steepness=2.0):
         trajectory = []
-        x_maximum = 2.5
-        for x_step in range(int(trajectory_resolution*x_maximum)):
-            x = x_step/trajectory_resolution
+        
+        for x_step in range(int(trajectory_resolution * x_maximum)):
+            # Calculate the x value, scaled by the gain
+            x = (x_step / trajectory_resolution) * gain
 
-            if(selected_trajectory == PARABOLA):
-                y = (x*x)
-            elif(selected_trajectory == SIGMOID):
-                y = 2/(1+math.exp(-steepness*x)) - 1
+            if Config.PLANNER_PATH == PlannerType.PATH_PARABOLA:
+                y = x ** 2  # Parabolic trajectory (y = x^2)
+            
+            elif Config.PLANNER_PATH == PlannerType.PATH_SIGMOID:
+                # Sigmoid trajectory with translation to pass through (0, 0)
+                y = 2 / (1 + math.exp(-steepness * x)) - 1
+            else:
+                raise ValueError("Unknown trajectory type selected")
 
-            trajectory.append([x,y])
-            #print([x,y])
-        # the return should be a list of trajectory points: [ [x1,y1], ..., [xn,yn]]
+            trajectory.append([x, y])
+        
         return trajectory
 
 #used this to test trajectory plkanner

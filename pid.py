@@ -4,21 +4,18 @@ from utilities import ControllerGains, Config, ControllerType, Logger
 class PID_ctrl:
     
     def __init__(self, config: dict[ControllerGains, float], filename, history_length=3):
-        
-        # Data for the controller
         self.history_length=history_length
         self.history=[]
         self.type = Config.CONTROLLER_TYPE
 
         # Controller gains
-        self.kp=config[ControllerGains.KP]    # proportional gain
-        self.kv=config[ControllerGains.KD]   # derivative gain
-        self.ki=config[ControllerGains.KI]    # integral gain
+        self.kp=config[ControllerGains.KP] # proportional gain
+        self.kv=config[ControllerGains.KD] # derivative gain
+        self.ki=config[ControllerGains.KI] # integral gain
         
         self.logger=Logger(filename + "_errors.csv")
         # Remeber that you are writing to the file named filename_ or errors.csv the following:
             # error, error_dot, error_int and time stamp
-
     
     def update(self, stamped_error, status):
         if status == False:
@@ -29,7 +26,6 @@ class PID_ctrl:
 
         
     def __update(self, stamped_error):
-        
         latest_error=stamped_error[0]
         stamp=stamped_error[1]
         
