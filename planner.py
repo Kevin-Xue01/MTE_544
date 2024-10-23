@@ -16,12 +16,12 @@ class planner:
         y = goalPoint[1]
         return x, y
 
-    def trajectory_planner(self, trajectory_resolution, gain, x_maximum, selected_trajectory, steepness=2.0):
+    def trajectory_planner(self, steepness=2.0):
         trajectory = []
         
-        for x_step in range(int(trajectory_resolution * x_maximum)):
+        for x_step in range(int(Config.PLANNER_TRAJECTORY_RESOLUTION * Config.PLANNER_TRAJECTORY_XMAX)):
             # Calculate the x value, scaled by the gain
-            x = (x_step / trajectory_resolution) * gain
+            x = (x_step / Config.PLANNER_TRAJECTORY_RESOLUTION) * Config.PLANNER_TRAJECTORY_GAIN
 
             if Config.PLANNER_PATH == PlannerType.PATH_PARABOLA:
                 y = x ** 2  # Parabolic trajectory (y = x^2)
