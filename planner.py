@@ -1,27 +1,18 @@
 import math
 from utilities import PlannerType
-# Type of planner
-POINT_PLANNER=0; TRAJECTORY_PLANNER=1
 
-PARABOLA = 0
-SIGMOID = 1
 selected_trajectory = PARABOLA
 trajectory_resolution = 100
 
 class planner:
     def __init__(self, type_: PlannerType):
-
         self.type=type_
-
     
     def plan(self, goalPoint=[-1.0, -1.0]):
-        
         if self.type==PlannerType.POINT:
             return self.point_planner(goalPoint)
-        
-        elif self.type==PlannerType.TRAJECTORY:
+        else:
             return self.trajectory_planner()
-
 
     def point_planner(self, goalPoint):
         x = goalPoint[0]
@@ -29,7 +20,7 @@ class planner:
         return x, y
 
     # TODO Part 6: Implement the trajectories here
-    def trajectory_planner(self):
+    def trajectory_planner(self, steepness = 2):
         trajectory = []
         x_maximum = 2.5
         for x_step in range(int(trajectory_resolution*x_maximum)):
@@ -38,7 +29,7 @@ class planner:
             if(selected_trajectory == PARABOLA):
                 y = (x*x)
             elif(selected_trajectory == SIGMOID):
-                y = 2/(1+math.exp(-2*x))
+                y = 2/(1+math.exp(-steepness*x)) - 1
 
             trajectory.append([x,y])
             #print([x,y])

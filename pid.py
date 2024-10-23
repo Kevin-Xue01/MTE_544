@@ -8,7 +8,7 @@ class PID_ctrl:
         # Data for the controller
         self.history_length=history_length
         self.history=[]
-        self.type = ControllerType.CURRENT
+        self.type = Config.CONTROLLER_TYPE
 
         # Controller gains
         self.kp=config[ControllerGains.KP]    # proportional gain

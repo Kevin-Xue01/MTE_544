@@ -9,11 +9,12 @@ class ControllerType(Enum):
     PD = 'PD'
     PI = 'PI'
     PID = 'PID'
-    CURRENT = P
 
 class PlannerType(Enum):
     POINT = 'POINT'
     TRAJECTORY = 'TRAJECTORY'
+    PATH_PARABOLA = 'PARABOLA'
+    PATH_SIGMOID = 'SIGMOID'
 
 class ControllerGains(Enum):
     KP = 'KP'
@@ -21,9 +22,14 @@ class ControllerGains(Enum):
     KD = 'KD'
 
 class Config:
+    X_0 = 0.0
+    Y_0 = 0.0
+
     LINEAR_VELOCITY_LIMIT = 1.0
     ANGULAR_VELOCITY_LIMIT = 1.0
-    
+
+    CONTROLLER_TYPE = ControllerType.P
+
     LINEAR_CONTROLLER_GAIN = {
         ControllerGains.KP: 1.2,
         ControllerGains.KI: 0.2,
@@ -34,6 +40,8 @@ class Config:
         ControllerGains.KI: 0.2,
         ControllerGains.KD: 0.8
     }
+
+    PLANNER_PATH = PlannerType.PATH_PARABOLA
 
 
 class Logger:
