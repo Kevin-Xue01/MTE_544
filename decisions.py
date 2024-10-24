@@ -44,9 +44,13 @@ class decision_maker(Node):
         
         # TODO Part 3: Check if you reached the goal
         if type(self.goal) == list:
-            reached_goal=...
+            pass
+            #reached_goal=...
         else: 
-            reached_goal=...
+            if(calculate_linear_error(self.localizer.getPose(), self.goal) < 0.1): #Robot is close enough to point
+                reached_goal = True
+            else:
+                reached_goal = False
         
 
         if reached_goal:
@@ -59,6 +63,8 @@ class decision_maker(Node):
             raise SystemExit("Goal has been reached")
         
         velocity, yaw_rate = self.controller.vel_request(self.localizer.getPose(), self.goal, True)
+        vel_msg.linear.x = velocity
+        vel_msg.angular.z = yaw_rate
 
         #TODO Part 4: Publish the velocity to move the robot
         self.publisher.publish(vel_msg)
@@ -74,9 +80,10 @@ def main(args=None):
     qos = QoSProfile(reliability=2, durability=2, history=1, depth=10)
     publisher_msg = Twist
     publishing_topic = "/cmd_vel"
+    destination_point = [1.5,-2] #random point in simulation
 
     if args.motion.lower() == "point":
-        DM = decision_maker(publisher_msg, publishing_topic, qos, PlannerType.POINT)
+        DM = decision_maker(publisher_msg, publishing_topic, qos,destination_point, PlannerType.POINT)
     elif args.motion.lower() == "trajectory":
         DM = decision_maker(publisher_msg, publishing_topic, qos, PlannerType.TRAJECTORY)
     else:

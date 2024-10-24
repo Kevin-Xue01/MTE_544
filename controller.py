@@ -5,8 +5,8 @@ from utilities import Config, calculate_angular_error, calculate_linear_error
 
 class controller:
     def __init__(self):
-        self.PID_linear=PID_ctrl(Config.LINEAR_CONTROLLER_GAIN, filename_="linear.csv")
-        self.PID_angular=PID_ctrl(Config.ANGULAR_CONTROLLER_GAIN, filename_="angular.csv")
+        self.PID_linear=PID_ctrl(Config.LINEAR_CONTROLLER_GAIN, filename="linear.csv")
+        self.PID_angular=PID_ctrl(Config.ANGULAR_CONTROLLER_GAIN, filename="angular.csv")
     
     def vel_request(self, pose, goal, status) -> tuple[float, float]:
         
