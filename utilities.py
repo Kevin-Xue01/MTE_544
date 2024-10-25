@@ -133,10 +133,5 @@ def calculate_angular_error(current_pose, goal_pose):
     y_diff = goal_pose[1] - float(current_pose[1])
 
     error_angular = atan2(y_diff,x_diff) - float(current_pose[2]) # range = [-π, π]
-    print("angular diff: ",error_angular)
-
-    #handles cases outside the [-π, π] range
-    if error_angular > 3.141 or error_angular < -3.141: 
-        error_angular = error_angular % 3.141
 
     return error_angular
