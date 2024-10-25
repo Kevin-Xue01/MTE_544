@@ -55,7 +55,7 @@ class trajectoryController(controller):
         return linear_vel, angular_vel
 
     def lookFarFor(self, pose, listGoals):
-        poseArray=np.array([pose[0], pose[1]]) 
+        poseArray=np.array([float(pose[0]), float(pose[1])]) 
         listGoalsArray=np.array(listGoals)
 
         distanceSquared=np.sum((listGoalsArray-poseArray)**2,
