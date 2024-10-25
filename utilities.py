@@ -24,6 +24,8 @@ class ControllerGains(Enum):
 class Config:
     X_0 = 0.0
     Y_0 = 0.0
+    X_F = 1.5
+    Y_F = -2.0
 
     LINEAR_VELOCITY_LIMIT = 1.0
     ANGULAR_VELOCITY_LIMIT = 1.0

@@ -6,7 +6,7 @@ import rclpy
 from rclpy.qos import QoSProfile
 from nav_msgs.msg import Odometry as odom
 
-from utilities import PlannerType, euler_from_quaternion, calculate_angular_error, calculate_linear_error
+from utilities import Config, PlannerType, euler_from_quaternion, calculate_angular_error, calculate_linear_error
 from pid import PID_ctrl
 from localization import localization, rawSensor
 from planner import planner
@@ -14,7 +14,7 @@ from controller import controller, trajectoryController
 
 class decision_maker(Node):
     
-    def __init__(self, publisher_msg, publishing_topic: str, qos_publisher, goalPoint, motion_type: PlannerType, rate=10):
+    def __init__(self, publisher_msg, publishing_topic: str, qos_publisher, goal_point, motion_type: PlannerType, rate=10):
         super().__init__("decision_maker")
 
         self.publisher = self.create_publisher(publisher_msg, publishing_topic, 10) # initialize velocity publisher
@@ -27,8 +27,8 @@ class decision_maker(Node):
         # Instantiate the localization, use rawSensor for now  
         self.localizer = localization(rawSensor)
 
-        # Instantiate the planner. NOTE: goalPoint is used only for the pointPlanner
-        self.goal = self.planner.plan(goalPoint)
+        # Instantiate the planner. NOTE: goal_point is used only for the pointPlanner
+        self.goal = self.planner.plan(goal_point)
 
         self.create_timer(publishing_period, self.timerCallback)
 
@@ -36,7 +36,7 @@ class decision_maker(Node):
     def timerCallback(self):
         rclpy.spin_once(self.localizer, timeout_sec=0.1)
 
-        if self.localizer.getPose()  is  None:
+        if self.localizer.getPose() is None:
             print("waiting for odom msgs ....")
             return
 
@@ -53,7 +53,6 @@ class decision_maker(Node):
                 reached_goal = True
             else:
                 reached_goal = False
-        
 
         if reached_goal:
             print("reached goal")
@@ -82,10 +81,9 @@ def main(args=None):
     qos = QoSProfile(reliability=2, durability=2, history=1, depth=10)
     publisher_msg = Twist
     publishing_topic = "/cmd_vel"
-    destination_point = [1.5,-2] #random point in simulation
 
     if args.motion.lower() == "point":
-        DM = decision_maker(publisher_msg, publishing_topic, qos,destination_point, PlannerType.POINT)
+        DM = decision_maker(publisher_msg, publishing_topic, qos, [Config.X_F, Config.Y_F], PlannerType.POINT)
     elif args.motion.lower() == "trajectory":
         DM = decision_maker(publisher_msg, publishing_topic, qos,destination_point, PlannerType.TRAJECTORY)
     else:
