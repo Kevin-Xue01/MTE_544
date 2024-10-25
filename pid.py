@@ -13,7 +13,7 @@ class PID_ctrl:
         
         self.logger=Logger(filename + "_errors.csv")
     
-    def update(self, stamped_error: tuple[float, str], status) -> float:
+    def update(self, stamped_error: tuple[float, int], status) -> float:
         if status == False:
             self.__update(stamped_error)
             return 0.0
@@ -21,7 +21,7 @@ class PID_ctrl:
             return self.__update(stamped_error)
 
         
-    def __update(self, stamped_error: tuple[float, str]): #
+    def __update(self, stamped_error: tuple[float, int]): #
         latest_error = stamped_error[0]
         latest_error_timestamp = stamped_error[1]
         

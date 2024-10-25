@@ -8,10 +8,10 @@ class controller:
         self.PID_linear = PID_ctrl(Config.LINEAR_CONTROLLER_GAIN, filename="linear")
         self.PID_angular = PID_ctrl(Config.ANGULAR_CONTROLLER_GAIN, filename="angular")
     
-    def vel_request(self, pose, goal, status) -> tuple[float, float]:
+    def vel_request(self, pose: list[float], goal, status) -> tuple[float, float]:
         
-        e_lin=calculate_linear_error(pose, goal)
-        e_ang=calculate_angular_error(pose, goal)
+        e_lin = calculate_linear_error(pose, goal)
+        e_ang = calculate_angular_error(pose, goal)
 
         linear_vel=self.PID_linear.update((e_lin, pose[3]), status)
         angular_vel=self.PID_angular.update((e_ang, pose[3]), status)
@@ -36,15 +36,15 @@ class trajectoryController(controller):
         super().__init__()
     
     def vel_request(self, pose, listGoals, status):
-        goal=self.lookFarFor(pose, listGoals)
+        goal = self.lookFarFor(pose, listGoals)
         
-        finalGoal=listGoals[-1]
+        finalGoal = listGoals[-1]
         
-        e_lin=calculate_linear_error(pose, finalGoal)
-        e_ang=calculate_angular_error(pose, goal)
+        e_lin = calculate_linear_error(pose, finalGoal)
+        e_ang = calculate_angular_error(pose, goal)
         
-        linear_vel=self.PID_linear.update((e_lin, pose[3]), status)
-        angular_vel=self.PID_angular.update((e_ang, pose[3]), status) 
+        linear_vel = self.PID_linear.update((e_lin, pose[3]), status)
+        angular_vel = self.PID_angular.update((e_ang, pose[3]), status) 
 
         if(abs(linear_vel) > Config.LINEAR_VELOCITY_LIMIT):
             linear_vel = Config.LINEAR_VELOCITY_LIMIT if linear_vel > 0 else (-Config.LINEAR_VELOCITY_LIMIT)
@@ -55,7 +55,7 @@ class trajectoryController(controller):
         return linear_vel, angular_vel
 
     def lookFarFor(self, pose, listGoals):
-        poseArray=np.array([float(pose[0]), float(pose[1])]) 
+        poseArray=np.array([pose[0], pose[1]]) 
         listGoalsArray=np.array(listGoals)
 
         distanceSquared=np.sum((listGoalsArray-poseArray)**2,

@@ -58,9 +58,9 @@ class Logger:
             file.write(header_str)
 
 
-    def log_values(self, values_list: list[str]):
+    def log_values(self, values_list: tuple[float, float, float, int]):
         with open(self.filename, 'a') as file:
-            vals_str = ",".join(values_list) + "\n"
+            vals_str = ",".join([str(val) for val in values_list]) + "\n"
             file.write(vals_str)
 
     def save_log(self):
