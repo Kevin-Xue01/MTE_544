@@ -44,8 +44,10 @@ class decision_maker(Node):
         
         # TODO Part 3: Check if you reached the goal
         if type(self.goal) == list:
-            pass
-            #reached_goal=...
+            if(calculate_linear_error(self.localizer.getPose(), self.goal[-1]) < 0.1):
+                reached_goal = True
+            else:
+                reached_goal = False
         else: 
             if(calculate_linear_error(self.localizer.getPose(), self.goal) < 0.1): #Robot is close enough to point
                 reached_goal = True
@@ -85,7 +87,7 @@ def main(args=None):
     if args.motion.lower() == "point":
         DM = decision_maker(publisher_msg, publishing_topic, qos,destination_point, PlannerType.POINT)
     elif args.motion.lower() == "trajectory":
-        DM = decision_maker(publisher_msg, publishing_topic, qos, PlannerType.TRAJECTORY)
+        DM = decision_maker(publisher_msg, publishing_topic, qos,destination_point, PlannerType.TRAJECTORY)
     else:
         print("invalid motion type", file=sys.stderr)        
 
