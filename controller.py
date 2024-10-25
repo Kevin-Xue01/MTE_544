@@ -8,13 +8,13 @@ class controller:
         self.PID_linear = PID_ctrl(Config.LINEAR_CONTROLLER_GAIN, filename="linear")
         self.PID_angular = PID_ctrl(Config.ANGULAR_CONTROLLER_GAIN, filename="angular")
     
-    def vel_request(self, pose: list[float], goal, status) -> tuple[float, float]:
+    def vel_request(self, pose: tuple[float, float, float, int], goal, status) -> tuple[float, float]:
         
         e_lin = calculate_linear_error(pose, goal)
         e_ang = calculate_angular_error(pose, goal)
 
-        linear_vel=self.PID_linear.update((e_lin, pose[3]), status)
-        angular_vel=self.PID_angular.update((e_ang, pose[3]), status)
+        linear_vel = self.PID_linear.update((e_lin, pose[3]), status)
+        angular_vel = self.PID_angular.update((e_ang, pose[3]), status)
         
         if(abs(linear_vel) > Config.LINEAR_VELOCITY_LIMIT):
             if(linear_vel>0):

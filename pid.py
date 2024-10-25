@@ -39,8 +39,8 @@ class PID_ctrl:
         
         for i in range(1, len(self.history)):
             
-            t0 = int(self.history[i-1][1])
-            t1 = int(self.history[i][1])
+            t0 = self.history[i-1][1]
+            t1 = self.history[i][1]
             
             dt = (t1 - t0) / 1e9
             dt_avg += dt
@@ -53,7 +53,7 @@ class PID_ctrl:
         sum_ = sum([val[0] for val in self.history])
         error_int = sum_ * dt_avg
         
-        self.logger.log_values([str(latest_error), str(error_dot), str(error_int), latest_error_timestamp])
+        self.logger.log_values((latest_error, error_dot, error_int, latest_error_timestamp))
         
         if self.type == ControllerType.P:
             return self.kp * latest_error

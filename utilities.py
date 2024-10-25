@@ -121,9 +121,9 @@ def euler_from_quaternion(quat):
     return euler_angles[2]
 
 
-def calculate_linear_error(current_pose, goal_pose):
-    x_diff = goal_pose[0] - float(current_pose[0])
-    y_diff = goal_pose[1] - float(current_pose[1])
+def calculate_linear_error(current_pose: tuple[float, float, float, int], goal_pose):
+    x_diff = goal_pose[0] - current_pose[0]
+    y_diff = goal_pose[1] - current_pose[1]
     
     error_linear= sqrt((x_diff*x_diff)+(y_diff*y_diff))
     print("linear diff:", error_linear)
@@ -131,9 +131,9 @@ def calculate_linear_error(current_pose, goal_pose):
     return error_linear
 
 def calculate_angular_error(current_pose, goal_pose):
-    x_diff = goal_pose[0] - float(current_pose[0])
-    y_diff = goal_pose[1] - float(current_pose[1])
+    x_diff = goal_pose[0] - current_pose[0]
+    y_diff = goal_pose[1] - current_pose[1]
 
-    error_angular = atan2(y_diff,x_diff) - float(current_pose[2]) # range = [-π, π]
+    error_angular = atan2(y_diff,x_diff) - current_pose[2] # range = [-π, π]
 
     return error_angular
