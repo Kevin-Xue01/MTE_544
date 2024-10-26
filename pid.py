@@ -42,7 +42,7 @@ class PID_ctrl:
             t0 = self.history[i-1][1]
             t1 = self.history[i][1]
             
-            dt = (t1 - t0) / 1e9
+            dt = (float(t1) - float(t0)) / float(1e9)
             dt_avg += dt
 
             error_dot += (self.history[i][0] - self.history[i-1][0]) / dt

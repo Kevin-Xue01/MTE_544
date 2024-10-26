@@ -24,29 +24,29 @@ class ControllerGains(Enum):
 class Config:
     X_0 = 0.0
     Y_0 = 0.0
-    X_F = 1.5
-    Y_F = -2.0
+    X_F = -1.0
+    Y_F = -1.0
 
-    LINEAR_VELOCITY_LIMIT = 1.0
-    ANGULAR_VELOCITY_LIMIT = 1.0
+    LINEAR_VELOCITY_LIMIT = 0.3
+    ANGULAR_VELOCITY_LIMIT = 1.9
 
-    CONTROLLER_TYPE = ControllerType.P
+    CONTROLLER_TYPE = ControllerType.PID
 
     LINEAR_CONTROLLER_GAIN = {
-        ControllerGains.KP: 1.2,
+        ControllerGains.KP: 0.2,
         ControllerGains.KI: 0.2,
-        ControllerGains.KD: 0.8
+        ControllerGains.KD: 0.2
     }
     ANGULAR_CONTROLLER_GAIN = {
-        ControllerGains.KP: 1.2,
-        ControllerGains.KI: 0.2,
-        ControllerGains.KD: 0.8
+        ControllerGains.KP: 0.4,
+        ControllerGains.KI: 0.1,
+        ControllerGains.KD: 0.4
     }
 
     PLANNER_PATH = PlannerType.PATH_PARABOLA
     PLANNER_TRAJECTORY_RESOLUTION = 100
     PLANNER_TRAJECTORY_GAIN = 1.0
-    PLANNER_TRAJECTORY_XMAX = 2.5
+    PLANNER_TRAJECTORY_XMAX = 1.5
 
 
 class Logger:
@@ -122,11 +122,13 @@ def euler_from_quaternion(quat):
 
 
 def calculate_linear_error(current_pose: tuple[float, float, float, int], goal_pose):
+    print(goal_pose)
+    print(current_pose)
     x_diff = goal_pose[0] - current_pose[0]
     y_diff = goal_pose[1] - current_pose[1]
     
     error_linear= sqrt((x_diff*x_diff)+(y_diff*y_diff))
-    print("linear diff:", error_linear)
+    # print("linear diff:", error_linear)
 
     return error_linear
 
@@ -135,5 +137,10 @@ def calculate_angular_error(current_pose, goal_pose):
     y_diff = goal_pose[1] - current_pose[1]
 
     error_angular = atan2(y_diff,x_diff) - current_pose[2] # range = [-π, π]
+
+    if error_angular > 3.1415:
+        error_angular -= 2 * 3.1415
+    elif error_angular < -3.1415:
+        error_angular += 2 * 3.1415
 
     return error_angular

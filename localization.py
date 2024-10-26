@@ -20,7 +20,7 @@ class localization(Node):
         odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10) # create QoS profile based on tutorial
         
         self.loc_logger=Logger("robot_pose.csv", headers=["x", "y", "theta", "stamp"])
-        self.pose = (0.0, 0.0, 0.0, int(datetime.now()))
+        self.pose = None
         
         if localizationType == rawSensor:
             self.create_subscription(odom, "/odom", self.odom_callback, qos_profile=odom_qos)

@@ -21,7 +21,7 @@ class decision_maker(Node):
 
         publishing_period = 1 / rate
         
-        self.controller = controller()
+        self.controller = controller() if motion_type == PlannerType.POINT else trajectoryController()
         self.planner = planner(motion_type)    
     
         # Instantiate the localization, use rawSensor for now  
@@ -30,11 +30,11 @@ class decision_maker(Node):
         # Instantiate the planner. NOTE: goal_point is used only for the pointPlanner
         self.goal = self.planner.plan(goal_point)
 
-        self.create_timer(publishing_period, self.timerCallback)
+        self.create_timer(0.01, self.timerCallback)
 
 
     def timerCallback(self):
-        rclpy.spin_once(self.localizer, timeout_sec=0.1)
+        rclpy.spin_once(self.localizer)
 
         if self.localizer.getPose() is None:
             print("waiting for odom msgs ....")
@@ -66,6 +66,8 @@ class decision_maker(Node):
         velocity, yaw_rate = self.controller.vel_request(self.localizer.getPose(), self.goal, True)
         vel_msg.linear.x = velocity
         vel_msg.angular.z = yaw_rate
+        print("Velocity:",velocity)
+        print("Yaw:",yaw_rate)
 
         #TODO Part 4: Publish the velocity to move the robot
         self.publisher.publish(vel_msg)
@@ -85,7 +87,7 @@ def main(args=None):
     if args.motion.lower() == "point":
         DM = decision_maker(publisher_msg, publishing_topic, qos, [Config.X_F, Config.Y_F], PlannerType.POINT)
     elif args.motion.lower() == "trajectory":
-        DM = decision_maker(publisher_msg, publishing_topic, qos,destination_point, PlannerType.TRAJECTORY)
+        DM = decision_maker(publisher_msg, publishing_topic, qos, [Config.X_F, Config.Y_F], PlannerType.TRAJECTORY)
     else:
         print("invalid motion type", file=sys.stderr)        
 
