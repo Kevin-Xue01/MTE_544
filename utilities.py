@@ -1,5 +1,5 @@
 import os
-from math import atan2, asin, sqrt, atan
+from math import atan2, asin, sqrt, atan, pi
 from scipy.spatial.transform import Rotation as R
 from geometry_msgs.msg._quaternion import Quaternion
 from enum import Enum
@@ -138,9 +138,9 @@ def calculate_angular_error(current_pose, goal_pose):
 
     error_angular = atan2(y_diff,x_diff) - current_pose[2] # range = [-π, π]
 
-    if error_angular > 3.1415:
-        error_angular -= 2 * 3.1415
-    elif error_angular < -3.1415:
-        error_angular += 2 * 3.1415
+    if error_angular > pi:
+        error_angular -= 2 * pi
+    elif error_angular < -pi:
+        error_angular += 2 * pi
 
     return error_angular
