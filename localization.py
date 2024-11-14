@@ -91,7 +91,11 @@ class localization(Node):
         self.pose=np.array(self.getPose())
 
         # TODO Part 4: log your data
-        self.loc_logger.log_values(xhat)
+        #presume kf_ax & kf_ay utilize kf values
+        kf_ax = xhat[5]*np.cos(xhat[2])-xhat[4]*np.sin(xhat[2])*xhat[3]
+        kf_ay = xhat[5]*np.sin(xhat[2])+xhat[4]*np.cos(xhat[2])*xhat[3]
+
+        self.loc_logger.log_values([ax, ay,kf_ax,kf_ay, xhat[0], xhat[1], xhat[4], xhat[3], xhat[0], xhat[1], self.get_clock().now().to_msg()])
       
     def odom_callback(self, pose_msg):
         
@@ -109,6 +113,6 @@ if __name__=="__main__":
     
     init()
     
-    LOCALIZER=localization()
+    LOCALIZER=localization(dt=0.1,type=kalmanFilter)
     
     spin(LOCALIZER)
