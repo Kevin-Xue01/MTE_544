@@ -44,13 +44,8 @@ class kalman_filter:
         x, y, th, w, v, vdot = self.x
         ax = vdot * np.cos(th) - v * w * np.sin(th)
         ay = vdot * np.sin(th) + v * w * np.cos(th)
-        
-        return np.array([
-            v# v
-            w,# w
-            ax, # ax
-            ay, # ay
-        ])
+
+        return np.array([v,w,ax,ay])
         
     # TODO Part 3: Impelment the motion model (state-transition matrice)
     def motion_model(self):
@@ -76,8 +71,8 @@ class kalman_filter:
         
         return np.array([
             #x, y,               th, w,             v, vdot
-            [1, 0,              -v * np.sin(th) * dt, 0,          np.cos(th) * dt,  0],
-            [0, 1,              v * np.cos(th) * dt,  0,          np.sin(th)*dt,  0],
+            [1, 0,-v * np.sin(th) * dt, 0, np.cos(th)*dt,  0],
+            [0, 1, v * np.cos(th) * dt, 0, np.sin(th)*dt,  0],
             [0, 0,                1, dt,           0,  0],
             [0, 0,                0, 1,            0,  0],
             [0, 0,                0, 0,            1,  dt],
