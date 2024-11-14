@@ -47,11 +47,11 @@ class localization(Node):
         
         # TODO Part 3: Set up the quantities for the EKF (hint: you will need the functions for the states and measurements)
         
-        x= ...
+        x= [0,0,0,0,0,0]
         
-        Q= ...
+        Q= 0.5 * np.eye(6)
 
-        R= ...
+        R= 0.5 * np.eye(4)
         
         P=np.eye(6) # initial covariance
         
@@ -91,7 +91,7 @@ class localization(Node):
         self.pose=np.array(self.getPose())
 
         # TODO Part 4: log your data
-        self.loc_logger.log_values(...)
+        self.loc_logger.log_values(xhat)
       
     def odom_callback(self, pose_msg):
         
