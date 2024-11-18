@@ -20,17 +20,19 @@ import numpy as np
 import message_filters
 
 rawSensors=0
+rawSensors_headers = ["x", "y", "th", "stamp"]
 kalmanFilter=1
+kalmanFilter_headers = ["imu_ax", "imu_ay", "kf_ax", "kf_ay","kf_vx","kf_w","kf_x", "kf_y","stamp"]
 odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
 
 class localization(Node):
     
-    def __init__(self, type, dt, loggerName="robotPose.csv", loggerHeaders=["imu_ax", "imu_ay", "kf_ax", "kf_ay","kf_vx","kf_w","kf_x", "kf_y","stamp"]):
+    def __init__(self, type, dt, loggerName="robotPose.csv"):
 
         super().__init__("localizer")
 
-        self.loc_logger=Logger( loggerName , loggerHeaders)
-        self.pose=None
+        self.loc_logger=Logger( loggerName , kalmanFilter_headers if type == kalmanFilter else rawSensors_headers)
+        self.pose=np.array([0.0, 0.0, 0.0, self.get_clock().now().to_msg()])
         
         if type==rawSensors:
             self.initRawSensors()
@@ -51,15 +53,15 @@ class localization(Node):
         
         Q= 0.5 * np.eye(6)
 
-        R= 0.5 * np.eye(4)
+        R= 0.25 * np.eye(4)
         
         P=np.eye(6) # initial covariance
         
         self.kf=kalman_filter(P,Q,R, x, dt)
         
         # TODO Part 3: Use the odometry and IMU data for the EKF
-        self.odom_sub=message_filters.Subscriber(self, odom, "/odom")
-        self.imu_sub=message_filters.Subscriber(self, Imu, "/imu")
+        self.odom_sub=message_filters.Subscriber(self, odom, "/odom", qos_profile=odom_qos)
+        self.imu_sub=message_filters.Subscriber(self, Imu, "/imu", qos_profile=odom_qos)
         
         time_syncher=message_filters.ApproximateTimeSynchronizer([self.odom_sub, self.imu_sub], queue_size=10, slop=0.1)
         time_syncher.registerCallback(self.fusion_callback)
@@ -86,23 +88,22 @@ class localization(Node):
         
         # Get the estimate
         xhat=self.kf.get_states()
-
-        # Update the pose estimate to be returned by getPose
-        self.pose=np.array(self.getPose())
+        self.pose=np.array([xhat[0], xhat[1], xhat[2], self.get_clock().now().to_msg()])
 
         # TODO Part 4: log your data
         #presume kf_ax & kf_ay utilize kf values
-        kf_ax = xhat[5]*np.cos(xhat[2])-xhat[4]*np.sin(xhat[2])*xhat[3]
-        kf_ay = xhat[5]*np.sin(xhat[2])+xhat[4]*np.cos(xhat[2])*xhat[3]
+        kf_ax = xhat[5]
+        kf_ay = xhat[4]*xhat[3]
 
-        self.loc_logger.log_values([ax, ay,kf_ax,kf_ay, xhat[0], xhat[1], xhat[4], xhat[3], xhat[0], xhat[1], self.get_clock().now().to_msg()])
+        self.loc_logger.log_values([ax, ay,kf_ax,kf_ay, xhat[4], xhat[3], xhat[0], xhat[1], self.get_clock().now().nanoseconds])
       
     def odom_callback(self, pose_msg):
         
         self.pose=[ pose_msg.pose.pose.position.x,
                     pose_msg.pose.pose.position.y,
                     euler_from_quaternion(pose_msg.pose.pose.orientation),
-                    pose_msg.header.stamp]
+                    self.get_clock().now().nanoseconds]
+        self.loc_logger.log_values(self.pose)
 
     # Return the estimated pose
     def getPose(self):

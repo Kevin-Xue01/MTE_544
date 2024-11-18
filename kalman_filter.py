@@ -42,8 +42,8 @@ class kalman_filter:
     # TODO Part 3: Implement here the measurement model
     def measurement_model(self):
         x, y, th, w, v, vdot = self.x
-        ax = vdot * np.cos(th) - v * w * np.sin(th)
-        ay = vdot * np.sin(th) + v * w * np.cos(th)
+        ax = vdot
+        ay = v * w
 
         return np.array([v,w,ax,ay])
         
@@ -88,7 +88,7 @@ class kalman_filter:
             [0,0,0  , 0, 1, 0], # v
             [0,0,0  , 1, 0, 0], # w
             [0,0,0  , 0, 0, 1], # ax
-            [0,0,0  , -v, -w, 0], # ay
+            [0,0,0  , v, w, 0], # ay
         ])
         
     # TODO Part 3: return the states here    

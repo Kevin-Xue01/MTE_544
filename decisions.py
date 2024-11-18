@@ -20,11 +20,11 @@ from controller import controller, trajectoryController
 class decision_maker(Node):
     
     
-    def __init__(self, publisher_msg, publishing_topic, qos_publisher, rate=10, motion_type=POINT_PLANNER):
+    def __init__(self, publisher_msg, publishing_topic, rate=10, motion_type=POINT_PLANNER):
 
         super().__init__("decision_maker")
-
-        self.publisher=self.create_publisher(publisher_msg, publishing_topic, qos_profile=qos_publisher)
+        qos = QoSProfile(reliability=2, durability=2, history=1, depth=10)
+        self.publisher=self.create_publisher(publisher_msg, publishing_topic, qos_profile=qos)
         
         
         publishing_period=1/rate
@@ -112,11 +112,11 @@ def main(args=None):
     
     
     if args.motion == "point":
-        DM=decision_maker(Twist, "/cmd_vel", 10, motion_type=POINT_PLANNER)
+        DM=decision_maker(Twist, "/cmd_vel", motion_type=POINT_PLANNER)
     elif args.motion == "trajectory":
-        DM=decision_maker(Twist, "/cmd_vel", 10, motion_type=TRAJECTORY_PLANNER)
+        DM=decision_maker(Twist, "/cmd_vel", motion_type=TRAJECTORY_PLANNER)
     elif args.motion == "spiral":
-        DM=decision_maker(Twist, "/cmd_vel", 10, motion_type=SPIRAL_4TUNE)
+        DM=decision_maker(Twist, "/cmd_vel", motion_type=SPIRAL_4TUNE)
     else:
         print("invalid motion type", file=sys.stderr)
         return

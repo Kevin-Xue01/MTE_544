@@ -10,7 +10,7 @@ PID=3 # proportional, integral, derivative
 # For the TODO items in this file, you can utilize your implementation from LAB-2 (if it was properly implemented)
 class PID_ctrl:
     
-    def __init__(self, type_, kp=1.2,kv=0.8,ki=0.2, history_length=3, filename_="errors.csv"):
+    def __init__(self, type_, kp=0.2,kv=0.2,ki=0.2, history_length=3, filename_="errors.csv"):
         
         # Data for the controller
         self.history_length=history_length
@@ -53,7 +53,6 @@ class PID_ctrl:
         error_dot=0
         
         for i in range(1, len(self.history)):
-            
             t0=Time.from_msg(self.history[i-1][1])
             t1=Time.from_msg(self.history[i][1])
             
