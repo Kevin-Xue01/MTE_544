@@ -33,12 +33,11 @@ class localization(Node):
 
         super().__init__("localizer")
         
-        
         self.loc_logger=Logger( loggerName , loggerHeaders)
         self.pose=None
         
         if type==rawSensors:
-            self.initRawSensors();
+            self.initRawSensors()
         elif type==kalmanFilter:
             self.initKalmanfilter()
             self.kalmanInitialized = False
@@ -52,14 +51,12 @@ class localization(Node):
         self.create_subscription(odom, "/odom", self.odom_callback, qos_profile=odom_qos)
 
     def initKalmanfilter(self):
-        
         self.odom_sub=message_filters.Subscriber(self, odom, "/odom", qos_profile=odom_qos)
         self.imu_sub=message_filters.Subscriber(self, Imu, "/imu", qos_profile=odom_qos)
         
         time_syncher=message_filters.ApproximateTimeSynchronizer([self.odom_sub, self.imu_sub], queue_size=10, slop=0.1)
         
         time_syncher.registerCallback(self.fusion_callback)
-        
     
     def fusion_callback(self, odom_msg: odom, imu_msg: Imu):
 
@@ -71,11 +68,9 @@ class localization(Node):
                         0,
                         0])        
             
-            # TODO PART 5 Bonus put the Q and R matrices
-            # that you conclude from lab Three
-            Q=...
-            R=...
-            P=...
+            Q= 0.5 * np.eye(6)
+            R= 0.5 * np.eye(4)
+            P=np.eye(6) # initial covariance
                         
             self.kf=kalman_filter(P,Q,R, x)
             
