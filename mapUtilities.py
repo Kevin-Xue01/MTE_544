@@ -164,8 +164,6 @@ class mapManipulator(Node):
         image_array=self.image_array
 
         from sklearn.neighbors import KDTree
-        
-        
 
         indices = np.where(image_array < 10)
         
@@ -175,8 +173,6 @@ class mapManipulator(Node):
         kdt=KDTree(occupied_points)
 
         dists=kdt.query(all_positions, k=1)[0][:]
-        print(kdt.query(all_positions, k=1)[0].shape)
-        print(kdt.query(all_positions, k=1)[0][:].shape)
         probabilities=np.exp( -(dists**2) / (2*self.laser_sig**2))
         
         likelihood_field=probabilities.reshape(image_array.shape)
@@ -288,7 +284,6 @@ if __name__=="__main__":
     args = parser.parse_args()
 
     MAP_UTILITIS=mapManipulator(args.map, args.std)
-    MAP_UTILITIS.make_likelihood_field()
     #rclpy.spin(MAP_UTILITIS)
 
 
