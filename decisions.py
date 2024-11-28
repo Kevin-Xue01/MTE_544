@@ -29,35 +29,31 @@ from geometry_msgs.msg import PoseStamped
 class decision_maker(Node):
     
     
-    def __init__(self, publisher_msg, publishing_topic, qos_publisher, rate=10, motion_type=POINT_PLANNER):
+    def __init__(self, publisher_msg, publishing_topic, rate, motion_type=POINT_PLANNER):
 
         super().__init__("decision_maker")
+        qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
 
-        self.publisher=self.create_publisher(publisher_msg, publishing_topic, qos_profile=qos_publisher)
-
-
+        self.publisher=self.create_publisher(publisher_msg, publishing_topic, qos_profile=qos)
+        
         self.create_subscription(PoseStamped, "/goal_pose", self.designPathFor, 10)
         
         self.pathPublisher = self.create_publisher(Path, '/designedPath', 10)
         
         publishing_period=1/rate
 
-        # TODO PART 5 choose your threshold
-        self.reachThreshold=...
+        self.reachThreshold=0.1
 
-        # TODO PART 5 your localization type
-        self.localizer=localization(...)
+        self.localizer=localization(kalmanFilter)
 
 
-        
         if motion_type==POINT_PLANNER:
             self.controller=controller(klp=0.2, klv=0.5, kap=0.8, kav=0.6)      
             self.planner=planner(POINT_PLANNER)
 
         
         elif motion_type==TRAJECTORY_PLANNER:
-            # TODO PART 5 Bonus Put the gains that you conclude from lab 2
-            self.controller=trajectoryController(...)      
+            self.controller=trajectoryController(klp=1.2, klv=0.2, kli=0.2, kap=1.8, kav=0.2, kai=0.8)      
             self.planner=planner(TRAJECTORY_PLANNER)
         
         else:
@@ -68,33 +64,26 @@ class decision_maker(Node):
 
         self.create_timer(publishing_period, self.timerCallback)
 
-
         print("waiting for your input position, use 2D nav goal in rviz2")
-
-
 
 
     # This is for the rviz2 interface
     def designPathFor(self, msg: PoseStamped):
-        
         spin_once(self.localizer)
         
         if self.localizer.getPose() is  None:
             print("waiting for odom msgs ....")
             return
         
-        self.goal=self.planner.plan([self.localizer.getPose()[0], self.localizer.getPose()[1]],
-                                     [msg.pose.position.x, msg.pose.position.y])
+        self.goal=self.planner.plan([self.localizer.getPose()[0], self.localizer.getPose()[1]], [msg.pose.position.x, msg.pose.position.y])
 
     
     def timerCallback(self):
-        
         spin_once(self.localizer)
 
         if self.localizer.getPose() is  None:
             print("waiting for odom msgs ....")
             return
-        
         
         vel_msg=Twist()
         
@@ -102,11 +91,9 @@ class decision_maker(Node):
             return
         
         if type(self.goal) == list:
-            reached_goal=True if calculate_linear_error(self.localizer.getPose(), self.goal[-1]) <self.reachThreshold else False
+            reached_goal=True if calculate_linear_error(self.localizer.getPose(), self.goal[-1]) < self.reachThreshold else False
         else: 
-            reached_goal=True if calculate_linear_error(self.localizer.getPose(), self.goal) <self.reachThreshold else False
-
-
+            reached_goal=True if calculate_linear_error(self.localizer.getPose(), self.goal) < self.reachThreshold else False
 
 
         if reached_goal:
@@ -116,24 +103,17 @@ class decision_maker(Node):
             self.controller.PID_angular.logger.save_log()
             self.controller.PID_linear.logger.save_log()
 
-
-            
             self.goal = None
             print("waiting for the new position input, use 2D nav goal on map")
-
             return
         
-        velocity, yaw_rate = self.controller.\
-            vel_request(self.localizer.getPose(), self.goal, True)
+        velocity, yaw_rate = self.controller.vel_request(self.localizer.getPose(), self.goal, True)
 
-        
         vel_msg.linear.x=velocity
         vel_msg.angular.z=yaw_rate
         
         self.publisher.publish(vel_msg)
         self.publishPathOnRviz2(self.goal)
-
-
 
     def publishPathOnRviz2(self, path):
 
@@ -161,11 +141,7 @@ class decision_maker(Node):
 
 import argparse
 def main(args=None):
-    
-    
     init()
-    
-    odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
     
     if args.motion == "point":
         DM=decision_maker(Twist, "/cmd_vel", 10, motion_type=POINT_PLANNER)
@@ -174,14 +150,10 @@ def main(args=None):
     else:
         print("invalid motion type", file=sys.stderr)
 
-
-
     try:
         spin(DM)
     except SystemExit:
         print(f"reached there successfully {DM.localizer.pose}")
-
-
 
 
 if __name__=="__main__":

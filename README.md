@@ -73,6 +73,7 @@ Check the Excel sheet (will publish on Wed Nov. 27th) to see which entrance of t
 
 Undock the robot, put the robot in the entrance marked for you, and reset the odometry, and then acquire the map as you did in LAB-1 and save it as room for use in the planning.
 
+Real Robot
 ```
 # terminal 1: reset the odometry pose
 ros2 service call /reset_pose irobot_create_msgs/srv/ResetPose {}
@@ -85,7 +86,14 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard
 # terminal 5: save the map
 ros2 run nav2_map_server map_saver_cli -f room
 ``` 
-
+Simulation
+```
+ros2 launch turtlebot3_gazebo turtlebot3_house.launch.py
+ros2 launch turtlebot4_navigation slam.launch.py
+ros2 launch turtlebot4_viz view_robot.launch.py
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+ros2 run nav2_map_server map_saver_cli -f <filepath>
+``` 
 **Note: if you face "Failed to spin map subscription" error, just rerun the `ros2 run nav2_map_server map_saver_cli -f room`**.
 
 When the map is acquired, make sure you **don't pick up the robot** so you wouldn't alter the odometry. If by any change you did, put the robot back on the dock, then undock and reset the odometry. This is to avoid for you to map the enviornment again.
