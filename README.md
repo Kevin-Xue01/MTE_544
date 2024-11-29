@@ -1,4 +1,5 @@
 # LAB 4 - Path planning and navigation
+![image](https://github.com/user-attachments/assets/7a177aba-dc9c-4402-a52b-36b38ce58cb8)
 
 ## Introduction
 
