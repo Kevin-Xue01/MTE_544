@@ -362,13 +362,14 @@ if __name__=="__main__":
     rclpy.init()
 
     parser=argparse.ArgumentParser()
-    parser.add_argument('--map', type=str, default="./your_map/room.yaml", help='the absolute path to argument')
+    parser.add_argument('--map', type=str, default="room.yaml", help='the absolute path to argument')
     parser.add_argument('--std', type=float, help='the std', default=0.01)
 
 
     args = parser.parse_args()
 
     MAP_UTILITIS=mapManipulator(args.map, args.std)
+    print(MAP_UTILITIS.getResolution())
 
     #rclpy.spin(MAP_UTILITIS)
 

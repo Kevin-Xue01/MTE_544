@@ -38,9 +38,9 @@ show_plot = True
 
 # When set to false, you can run this script stand-alone, it will use the information specified in main
 # When set to true, you are expected to use this with the stack and the specified map
-use_map = True
+use_map = False
 
-def prm_graph(start, goal, obstacles_list, robot_radius, *, rng=None, m_utilities=None):
+def prm_graph(start, goal, obstacles_list, robot_radius, *, rng=None, m_utilities: mapManipulator=None):
     """
     Run probabilistic road map graph generation
 
@@ -64,8 +64,11 @@ def prm_graph(start, goal, obstacles_list, robot_radius, *, rng=None, m_utilitie
         # [Part 2] TODO The radius of the robot and the maximum edge lengths are given in [m], but the map is given in cell positions.
         # Therefore, when using the map, the radius and edge length need to be adjusted for the resolution of the cell positions
         # Hint: in the map utilities there is the resolution stored
-        robot_radius = ...
-        max_edge_len = ...
+
+        # resolution = m_utilities.getResolution()
+        resolution = 0.05
+        robot_radius /= resolution
+        max_edge_len /= resolution
 
     # Get sample data
     sample_points = generate_sample_points(start, goal,
@@ -158,10 +161,16 @@ def generate_sample_points(start, goal, rr, obstacles_list, obstacle_kd_tree, rn
     sample_x, sample_y = [], []
 
     while len(sample_x) <= N_SAMPLE:
-        ...
-    
+        x_rand = rng.uniform(min(ox), max(ox))
+        y_rand = rng.uniform(min(oy), max(oy))
+        
+        if obstacle_kd_tree.query([x_rand, y_rand])[0] > rr:
+            sample_x.append(x_rand)
+            sample_y.append(y_rand)
+
     # [Part 2] TODO Add also the start and goal to the samples so that they are connected to the roadmap
-    ...
+    sample_x.extend([sx, gx])
+    sample_y.extend([sy, gy])
 
     return [sample_x, sample_y]
 
@@ -186,8 +195,20 @@ def is_collision(sx, sy, gx, gy, rr, obstacle_kd_tree, max_edge_len):
 
     # [Part 2] TODO Check where there would be a collision with an obstacle between two nodes at sx,sy and gx,gy, and wether the edge between the two nodes is greater than max_edge_len
     # Hint: you may leverage on the query function of KDTree
-    
-    ...
+    # Compute the Euclidean distance
+    distance = math.hypot(gx - sx, gy - sy)
+    if distance > max_edge_len:
+        return True
+
+    # Check for collisions along the path
+    num_points = int(distance / rr)
+    x_points = np.linspace(sx, gx, num_points)
+    y_points = np.linspace(sy, gy, num_points)
+
+    for x, y in zip(x_points, y_points):
+        dist, _ = obstacle_kd_tree.query([x, y])
+        if dist <= rr:
+            return True
 
     return False  # No collision
 
@@ -211,18 +232,26 @@ def generate_road_map(sample_points, rr, obstacle_kd_tree, max_edge_len, m_utili
     [[(i1, j1), (i2, j2), (i3, j3)], [(), (), ()], [(), (), ()], ...]
     Indicates that sample_point[0] is connected to 3 nodes, at indices (i1,j1), (i2,j2), (i3,j3).
     """
-
+    # print(np.array(sample_points).shape)
     sample_x = sample_points[0]
     sample_y = sample_points[1]
 
     # Note: The roadmap should have the same length as sample_points
     road_map = []
-    n_sample = len(sample_x)
+    kd_tree = KDTree(np.column_stack((sample_x, sample_y)))
 
     #[Part 2] TODO Generate roadmap for all sample points, i.e. create the edges between nodes (sample points)
     # Note: use the is_collision function to check for possible collisions (do not make an edge if there is collision)
     # Hint: you may ceate a KDTree object to help with the generation of the roadmap, but other methods also work
-    ...
+
+    for i, (sx, sy) in enumerate(zip(sample_x, sample_y)):
+        neighbors = kd_tree.query([sx, sy], k=N_KNN + 1)[1]
+        edges = []
+        for neighbor in neighbors[1:]:  # Skip self in the neighbors list
+            gx, gy = sample_x[neighbor], sample_y[neighbor]
+            if not is_collision(sx, sy, gx, gy, rr, obstacle_kd_tree, max_edge_len):
+                edges.append(neighbor)
+        road_map.append(edges)
 
     return road_map
 
