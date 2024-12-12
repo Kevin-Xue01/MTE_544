@@ -64,9 +64,7 @@ def prm_graph(start, goal, obstacles_list, robot_radius, *, rng=None, m_utilitie
         # [Part 2] TODO The radius of the robot and the maximum edge lengths are given in [m], but the map is given in cell positions.
         # Therefore, when using the map, the radius and edge length need to be adjusted for the resolution of the cell positions
         # Hint: in the map utilities there is the resolution stored
-
-        # resolution = m_utilities.getResolution()
-        resolution = 0.05
+        resolution = m_utilities.getResolution()
         robot_radius /= resolution
         max_edge_len /= resolution
 
