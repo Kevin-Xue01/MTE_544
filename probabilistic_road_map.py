@@ -226,11 +226,11 @@ def generate_road_map(sample_points, rr, obstacle_kd_tree, max_edge_len, m_utili
     :param m_utilities: optional, needed when using costmap
     :return road_map
 
-    Create a roadmap that is a list of sublists of tuples.
-    Each sublist is a list of tuples corresponding to the indices of the nodes to which the sample point has an edge connection.
+    Create a roadmap that is a list of sublists.
+    Each sublist is a list of tlists corresponding to the indices of the nodes to which the sample point has an edge connection.
     e.g. for N_KNN=3:
-    [[(i1, j1), (i2, j2), (i3, j3)], [(), (), ()], [(), (), ()], ...]
-    Indicates that sample_point[0] is connected to 3 nodes, at indices (i1,j1), (i2,j2), (i3,j3).
+    [i, j, k], [.. , .., ..], [.. , .., ..], ...]
+    Indicates that sample_point[0] is connected to 3 nodes, at positions i, j, k.
     """
     # print(np.array(sample_points).shape)
     sample_x = sample_points[0]
