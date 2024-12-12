@@ -52,18 +52,20 @@ def prm_graph(start, goal, obstacles_list, robot_radius, *, rng=None, m_utilitie
     :pram m_utilities: when using a map, pass the map utilies that contains the costmap information
     :return: roadmap (and list of sample points if using the map)
     """
-
     print("Generating PRM graph")
 
     obstacle_kd_tree = KDTree(obstacles_list)
 
     # By default, we use the set maximum edge length
     max_edge_len = MAX_EDGE_LEN
+
     # Generate the sample points
     if use_map:
         # [Part 2] TODO The radius of the robot and the maximum edge lengths are given in [m], but the map is given in cell positions.
         # Therefore, when using the map, the radius and edge length need to be adjusted for the resolution of the cell positions
         # Hint: in the map utilities there is the resolution stored
+
+        # Adjust the robot radius and max edge length based on the map resolution
         resolution = m_utilities.getResolution()
         robot_radius /= resolution
         max_edge_len /= resolution
@@ -156,13 +158,14 @@ def generate_sample_points(start, goal, rr, obstacles_list, obstacle_kd_tree, rn
     # When using the map, the samples should be indices of the cells of the costmap, therefore remember to round them to integer values.
     # Hint: you may leverage on the query function of KDTree to find the nearest neighbors
 
+    # Generate random points within the bounding box of the obstacles
     sample_x, sample_y = [], []
 
     while len(sample_x) <= N_SAMPLE:
-        x_rand = rng.uniform(min(ox), max(ox))
-        y_rand = rng.uniform(min(oy), max(oy))
+        x_rand = rng.uniform(min(ox), max(ox)) # generate random x value
+        y_rand = rng.uniform(min(oy), max(oy)) # generate random y value
         
-        if obstacle_kd_tree.query([x_rand, y_rand])[0] > rr:
+        if obstacle_kd_tree.query([x_rand, y_rand])[0] > rr: # ensure that samples are spaced at least rr away from any obstacles
             sample_x.append(x_rand)
             sample_y.append(y_rand)
 
@@ -173,7 +176,7 @@ def generate_sample_points(start, goal, rr, obstacles_list, obstacle_kd_tree, rn
     return [sample_x, sample_y]
 
 # Check whethere there is a possible collision between two nodes, used for generating the roadmap after sampling the points.
-def is_collision(sx, sy, gx, gy, rr, obstacle_kd_tree, max_edge_len):
+def is_collision(sx, sy, gx, gy, rr, obstacle_kd_tree: KDTree, max_edge_len):
     """
     Check collisions
     
@@ -193,9 +196,10 @@ def is_collision(sx, sy, gx, gy, rr, obstacle_kd_tree, max_edge_len):
 
     # [Part 2] TODO Check where there would be a collision with an obstacle between two nodes at sx,sy and gx,gy, and wether the edge between the two nodes is greater than max_edge_len
     # Hint: you may leverage on the query function of KDTree
+
     # Compute the Euclidean distance
     distance = math.hypot(gx - sx, gy - sy)
-    if distance > max_edge_len:
+    if distance > max_edge_len: # return collision if distance exceeds max_edge_len
         return True
 
     # Check for collisions along the path
@@ -205,7 +209,7 @@ def is_collision(sx, sy, gx, gy, rr, obstacle_kd_tree, max_edge_len):
 
     for x, y in zip(x_points, y_points):
         dist, _ = obstacle_kd_tree.query([x, y])
-        if dist <= rr:
+        if dist <= rr: # collision detected
             return True
 
     return False  # No collision
@@ -230,7 +234,6 @@ def generate_road_map(sample_points, rr, obstacle_kd_tree, max_edge_len, m_utili
     [i, j, k], [.. , .., ..], [.. , .., ..], ...]
     Indicates that sample_point[0] is connected to 3 nodes, at positions i, j, k.
     """
-    # print(np.array(sample_points).shape)
     sample_x = sample_points[0]
     sample_y = sample_points[1]
 
@@ -243,7 +246,7 @@ def generate_road_map(sample_points, rr, obstacle_kd_tree, max_edge_len, m_utili
     # Hint: you may ceate a KDTree object to help with the generation of the roadmap, but other methods also work
 
     for i, (sx, sy) in enumerate(zip(sample_x, sample_y)):
-        neighbors = kd_tree.query([sx, sy], k=N_KNN + 1)[1]
+        neighbors = kd_tree.query([sx, sy], k=N_KNN + 1)[1] # get index of N_KNN closest neighbors
         edges = []
         for neighbor in neighbors[1:]:  # Skip self in the neighbors list
             gx, gy = sample_x[neighbor], sample_y[neighbor]
