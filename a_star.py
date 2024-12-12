@@ -214,8 +214,54 @@ def search_PRM(points, prm, start, end):
     end_node = Node(None, end_idx)
     end_node.g = end_node.h = end_node.f = 0
 
-    path_points = []
+    # Initialize open and closed lists
+    open_list = [start_node]
+    closed_list = []
 
-    ...
-    
-    return path_points
+    # Loop until the end is found or no more nodes are available
+    while open_list:
+        # Get the node with the lowest f value from the open list
+        current_node = min(open_list, key=lambda node: node.f)
+        open_list.remove(current_node)
+        closed_list.append(current_node)
+
+        # Check if we have reached the goal
+        if current_node == end_node:
+            path = []
+            while current_node:
+                path.append(points[current_node.position])
+                current_node = current_node.parent
+            return path[::-1]  # Reverse the path to start-to-end order
+
+        # Iterate over neighbors of the current node
+        for neighbor_idx in prm[current_node.position]:
+            # Check if the neighbor is already in the closed list
+            if any(node.position == neighbor_idx for node in closed_list):
+                continue
+
+            # Calculate g (cost to reach this neighbor), h (heuristic), and f values
+            g = current_node.g + np.linalg.norm(
+                np.array(points[current_node.position]) - np.array(points[neighbor_idx])
+            )
+            h = np.linalg.norm(np.array(points[neighbor_idx]) - np.array(points[end_idx]))
+            f = g + h
+
+            # Check if the neighbor is already in the open list
+            existing_node = next((node for node in open_list if node.position == neighbor_idx), None)
+            if existing_node:
+                # If the new path to the neighbor is better, update it
+                if g < existing_node.g:
+                    existing_node.g = g
+                    existing_node.h = h
+                    existing_node.f = f
+                    existing_node.parent = current_node
+            else:
+                # Otherwise, create a new node and add it to the open list
+                neighbor_node = Node(current_node, neighbor_idx)
+                neighbor_node.g = g
+                neighbor_node.h = h
+                neighbor_node.f = f
+                open_list.append(neighbor_node)
+
+    # If no path is found, return an empty list
+    return []
