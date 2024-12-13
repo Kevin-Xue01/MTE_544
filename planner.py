@@ -52,7 +52,7 @@ class planner:
                 startPose, 
                 endPose, 
                 self.obstaclesListCell, 
-                robot_radius, 
+                3, 
                 rng=np.random.default_rng(), 
                 m_utilities=self.m_utilities
             )

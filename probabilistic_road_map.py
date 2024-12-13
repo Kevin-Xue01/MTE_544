@@ -34,11 +34,11 @@ N_SAMPLE = 800  # number of sample_points
 N_KNN = 10  # number of edge from one sampled point (one node)
 MAX_EDGE_LEN = 3  # Maximum edge length, in [m]
 
-show_plot = True
+show_plot = False
 
 # When set to false, you can run this script stand-alone, it will use the information specified in main
 # When set to true, you are expected to use this with the stack and the specified map
-use_map = False
+use_map = True
 
 def prm_graph(start, goal, obstacles_list, robot_radius, *, rng=None, m_utilities: mapManipulator=None):
     """

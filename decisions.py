@@ -7,7 +7,7 @@ from rclpy import init, spin, spin_once
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 
-from rclpy.qos import QoSProfile
+from rclpy.qos import QoSProfile, ReliabilityPolicy
 from nav_msgs.msg import Odometry as odom
 
 from localization import localization, rawSensors, kalmanFilter
@@ -39,7 +39,7 @@ class decision_maker(Node):
 
 
         # [Part 4] TODO Use the EKF localization instead of rawSensors
-        self.localizer=localization(rawSensors)
+        self.localizer=localization(kalmanFilter)
 
 
         self.goal = None
@@ -53,7 +53,7 @@ class decision_maker(Node):
             return -1
 
         # [Part 4] TODO PID gains if needed
-        self.controller=trajectoryController(klp=0.2, klv=0.5, kap=0.8, kav=0.6)      
+        self.controller=trajectoryController(klp=1.2, klv=0.2, kli=0.2, kap=1.8, kav=0.2, kai=0.8)      
         
         if motion_type in [TRAJECTORY_PLANNER, ASTAR_PLANNER, PRM_PLANNER]:
             self.planner = planner(motion_type)
@@ -156,10 +156,10 @@ def main(args=None):
     
     init()
     
-    odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
+    odom_qos=QoSProfile(reliability=ReliabilityPolicy.SYSTEM_DEFAULT, durability=2, history=1, depth=10)
 
     # Set the desired planner here
-    DM=decision_maker(Twist, "/cmd_vel", 10, motion_type=PRM_PLANNER)
+    DM=decision_maker(Twist, "/cmd_vel", odom_qos, motion_type=PRM_PLANNER)
 
     try:
         spin(DM)
