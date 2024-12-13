@@ -39,32 +39,26 @@ class planner:
         self.obstaclesListCell = np.array(self.m_utilities.getAllObstaclesCell())  
 
         
-    def trajectory_planner(self, startPoseCart, endPoseCart, type):
+    def trajectory_planner(self, startPoseCart, endPoseCart, _type):
 
         startPose=self.m_utilities.position_2_cell(startPoseCart)
         endPose=self.m_utilities.position_2_cell(endPoseCart)
 
         # [Part 3] TODO Use the PRM and search_PRM to generate the path
         # Hint: see the example of the ASTAR case below, there is no scaling factor for PRM
-        if type == PRM_PLANNER:
+        if _type == PRM_PLANNER:
             # Generate the PRM graph
             sample_points, roadmap = prm_graph(
                 startPose, 
                 endPose, 
                 self.obstaclesListCell, 
-                3, 
+                ROBOT_RADIUS, 
                 rng=np.random.default_rng(), 
                 m_utilities=self.m_utilities
             )
 
-            start_idx = sample_points.index(tuple(startPose))
-            goal_idx = sample_points.index(tuple(endPose))
-            path_indices = search_PRM(roadmap, start_idx, goal_idx)
-
-            # Convert path indices back to Cartesian coordinates
-            path = [self.m_utilities.cell_2_position(sample_points[i]) for i in path_indices]
-
-        elif type == ASTAR_PLANNER: # This is the same planner you should have implemented for Lab4
+            path_ = search_PRM(sample_points, roadmap, startPose, endPose)
+        elif _type == ASTAR_PLANNER: # This is the same planner you should have implemented for Lab4
             scale_factor = 4 # Depending on resolution, this can be smaller or larger
             startPose = [int(i/scale_factor) for i in startPose]
             endPose   = [int(j/scale_factor) for j in endPose]

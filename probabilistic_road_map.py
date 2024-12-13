@@ -33,7 +33,7 @@ from mapUtilities import *
 N_SAMPLE = 800  # number of sample_points
 N_KNN = 10  # number of edge from one sampled point (one node)
 MAX_EDGE_LEN = 3  # Maximum edge length, in [m]
-
+ROBOT_RADIUS = 0.2 # Robot radius, in [m]
 show_plot = False
 
 # When set to false, you can run this script stand-alone, it will use the information specified in main
@@ -162,9 +162,9 @@ def generate_sample_points(start, goal, rr, obstacles_list, obstacle_kd_tree, rn
     sample_x, sample_y = [], []
 
     while len(sample_x) <= N_SAMPLE:
-        x_rand = rng.uniform(min(ox), max(ox)) # generate random x value
-        y_rand = rng.uniform(min(oy), max(oy)) # generate random y value
-        
+        x_rand = round(rng.uniform(min(ox), max(ox))) # generate random x value
+        y_rand = round(rng.uniform(min(oy), max(oy))) # generate random y value
+
         if obstacle_kd_tree.query([x_rand, y_rand])[0] > rr: # ensure that samples are spaced at least rr away from any obstacles
             sample_x.append(x_rand)
             sample_y.append(y_rand)
