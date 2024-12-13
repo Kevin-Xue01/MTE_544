@@ -34,7 +34,7 @@ N_SAMPLE = 800  # number of sample_points
 N_KNN = 10  # number of edge from one sampled point (one node)
 MAX_EDGE_LEN = 3  # Maximum edge length, in [m]
 ROBOT_RADIUS = 0.2 # Robot radius, in [m]
-show_plot = False
+show_plot = True
 
 # When set to false, you can run this script stand-alone, it will use the information specified in main
 # When set to true, you are expected to use this with the stack and the specified map
