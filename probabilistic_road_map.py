@@ -32,9 +32,9 @@ from mapUtilities import *
 # Parameters of PRM
 N_SAMPLE = 1000  # number of sample_points
 N_KNN = 10  # number of edge from one sampled point (one node)
-MAX_EDGE_LEN = 5 # Maximum edge length, in [m]
+MAX_EDGE_LEN = 2 # Maximum edge length, in [m]
 ROBOT_RADIUS = 0.2 # Robot radius, in [m]
-show_plot = False
+show_plot = True
 
 # When set to false, you can run this script stand-alone, it will use the information specified in main
 # When set to true, you are expected to use this with the stack and the specified map
@@ -269,7 +269,7 @@ def plot_road_map(road_map, sample_points):
         for ii in range(len(road_map[i])):
             ind = road_map[i][ii]
             plt.plot([sample_x[i], sample_x[ind]],
-                    [sample_y[i], sample_y[ind]], "-c")
+                    [sample_y[i], sample_y[ind]], "-c", linewidth=0.5)
 
 
 def main(rng=None):

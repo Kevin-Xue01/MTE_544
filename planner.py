@@ -62,7 +62,7 @@ class planner:
             end_time = time.time()
             print(f"The time took for PRM calculation was {end_time - start_time}")
         elif _type == ASTAR_PLANNER: # This is the same planner you should have implemented for Lab4
-            scale_factor = 4 # Depending on resolution, this can be smaller or larger
+            scale_factor = 1 # Depending on resolution, this can be smaller or larger
             startPose = [int(i/scale_factor) for i in startPose]
             endPose   = [int(j/scale_factor) for j in endPose]
             start_time = time.time()
