@@ -76,7 +76,15 @@ class planner:
             path_ = [[x*scale_factor, y*scale_factor] for x,y in path ]
 
         Path = np.array(list(map(self.m_utilities.cell_2_position, path_ )))
-        print(f'Path length = {math.hypot(Path[0, 0] - Path[0, -1], Path[1, 0] - Path[1, -1])}')
+        path_length = 0.0
+
+        for i in range(1, len(Path)):
+            x1, y1 = Path[i-1, 0], Path[i-1, 1]
+            x2, y2 = Path[i, 0], Path[i, 1]
+            path_length += math.hypot(x2 - x1, y2 - y1)
+    
+        print(f'Path length = {path_length}')
+        
         # Plot the generated path
         plt.plot(self.obstaclesList[:,0], self.obstaclesList[:,1], '.')
         plt.plot(Path[:,0], Path[:,1], '-*')
