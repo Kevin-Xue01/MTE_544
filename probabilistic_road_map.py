@@ -30,9 +30,9 @@ from scipy.spatial import KDTree
 from mapUtilities import *
 
 # Parameters of PRM
-N_SAMPLE = 800  # number of sample_points
+N_SAMPLE = 1000  # number of sample_points
 N_KNN = 10  # number of edge from one sampled point (one node)
-MAX_EDGE_LEN = 3  # Maximum edge length, in [m]
+MAX_EDGE_LEN = 5 # Maximum edge length, in [m]
 ROBOT_RADIUS = 0.2 # Robot radius, in [m]
 show_plot = False
 

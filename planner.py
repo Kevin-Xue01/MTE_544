@@ -77,14 +77,14 @@ class planner:
 
         Path = np.array(list(map(self.m_utilities.cell_2_position, path_ )))
         path_length = 0.0
-
+        start_to_end_dist = math.hypot(Path[0, 0] - Path[-1, 0], Path[0, 1] - Path[-1, 1])
         for i in range(1, len(Path)):
             x1, y1 = Path[i-1, 0], Path[i-1, 1]
             x2, y2 = Path[i, 0], Path[i, 1]
             path_length += math.hypot(x2 - x1, y2 - y1)
     
-        print(f'Path length = {path_length}')
-        
+        print(f'Path length = {path_length}, Start-End distance = {start_to_end_dist}, Diff = {abs(path_length - start_to_end_dist)}')
+
         # Plot the generated path
         plt.plot(self.obstaclesList[:,0], self.obstaclesList[:,1], '.')
         plt.plot(Path[:,0], Path[:,1], '-*')
