@@ -250,7 +250,7 @@ def generate_road_map(sample_points, rr, obstacle_kd_tree, max_edge_len, m_utili
         edges = []
         for neighbor in neighbors[1:]:  # Skip self in the neighbors list
             gx, gy = sample_x[neighbor], sample_y[neighbor]
-            if not is_collision(sx, sy, gx, gy, rr, obstacle_kd_tree, max_edge_len):
+            if not is_collision(sx, sy, gx, gy, rr, obstacle_kd_tree, max_edge_len): # check for collision
                 edges.append(neighbor)
         road_map.append(edges)
 

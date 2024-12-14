@@ -58,7 +58,7 @@ class planner:
                 m_utilities=self.m_utilities
             )
 
-            path_ = search_PRM(sample_points, roadmap, startPose, endPose)
+            path_ = search_PRM(sample_points, roadmap, startPose, endPose) # search the PRM via A* to find path from startPose to endPose
             end_time = time.time()
             print(f"The time took for PRM calculation was {end_time - start_time}")
         elif _type == ASTAR_PLANNER: # This is the same planner you should have implemented for Lab4
@@ -76,13 +76,14 @@ class planner:
             path_ = [[x*scale_factor, y*scale_factor] for x,y in path ]
 
         Path = np.array(list(map(self.m_utilities.cell_2_position, path_ )))
+
+        # Get path metrics
         path_length = 0.0
         start_to_end_dist = math.hypot(Path[0, 0] - Path[-1, 0], Path[0, 1] - Path[-1, 1])
         for i in range(1, len(Path)):
             x1, y1 = Path[i-1, 0], Path[i-1, 1]
             x2, y2 = Path[i, 0], Path[i, 1]
             path_length += math.hypot(x2 - x1, y2 - y1)
-    
         print(f'Path length = {path_length}, Start-End distance = {start_to_end_dist}, Diff = {abs(path_length - start_to_end_dist)}')
 
         # Plot the generated path
